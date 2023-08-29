@@ -9,7 +9,7 @@
 #include <string>
 using namespace vex;
 bool wireless_terminal_on = true;
-float loop_refresh_time = 100;
+float loop_refresh_time = 20;
 void standardReadout()
 {
     // sweep.sweep_cycle();
@@ -29,7 +29,8 @@ void standardReadout()
 int counter = 0;
 void graphingFormat()
 {
-    printf("(%.3f, %.3f),", Brain.timer(msec), bot.linear_speed);
+    printf("(%.3f, %.3f),", bot.x, bot.y);
+    //printf("(%.3f, %.3f),", Brain.timer(msec), bot.linear_speed);
     // printf("(%.3f, %.3f),(%.3f, %.3f),", bot.x, bot.y, bot.x_target, bot.y_target);
     if (counter >= 2)
     {
@@ -45,11 +46,10 @@ void print_to_terminal()
 {
     if (wireless_terminal_on)
     {
-        standardReadout();
+        //standardReadout();
 
         // wait(1000, vex::sec);
-        // standardReadout();
-        // graphingFormat();
+         graphingFormat();
         // if(start_time > 0) xy_coord_pairs();
     }
     std::cout << "" << std::flush;
