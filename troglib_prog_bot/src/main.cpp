@@ -26,7 +26,7 @@ encoder TX = encoder(Brain.ThreeWirePort.G);
 
 
 extern task motor_control;
-  data bot(0.0586285, -0.0164235, 1.012031935, true);
+  data bot(0.0586285, -0.0164235, 1.011868, true);
   PID sweeper_pid(.1,0,0);
   sweeper_class sweep;
   PID drive_pid(0, 0, 0);

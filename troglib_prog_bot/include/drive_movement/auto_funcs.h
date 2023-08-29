@@ -1,11 +1,13 @@
 #pragma once
 extern double start_time;
 extern double end_time;
+extern double temporary_multiplier;
 
 void start_auto(float x, float y, float h);
 void stop_auto();
 void delay(float msec);
 void movement_reset();
+void odomTune(float kp, float ki, float kd, float maxSpeed);
 void turn_to(float ang, float kp, float ki, float kd, float maxSpeed, float breakang);
 void turnToExplicit(float ang, float kp, float ki, float kd, float maxSpeed, float breakang);
 void tuneOffsets(float ang, float kp, float ki, float kd, float maxSpeed, float breakang);

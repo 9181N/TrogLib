@@ -7,6 +7,7 @@
 #include "vex.h"
 #include "drive_movement/auto_funcs.h"
 #include "data_output/wireless_terminal.h"
+#include "data_output/brain_screen.h"
 #include "robot_config.h"
 #include <iostream>
 #include <iomanip>
@@ -92,17 +93,51 @@ void turnToExplicit(float ang, float kp, float ki, float kd, float maxSpeed, flo
     }
     pid_calc.auto_wrap_turn_target = false;
 }
-
+double temporary_multiplier = 0;
+bool heading_multiplier_step = true;
 void tuneOffsets(float ang, float kp, float ki, float kd, float maxSpeed, float breakang)
 {
+    wireless_terminal_on = false;
+    tuning_screen_mode = true;
     pid_calc.auto_wrap_turn_target = true;
     turnToExplicit(ang, kp, ki, kd, maxSpeed, breakang);
     delay(1000);
-    wireless_terminal_on = false;
+    enable_auto_movement = false;
+    left_drive(0, 0, 0), right_drive(0, 0, 0);
+    if (heading_multiplier_step) {
+    while (!Brain.Screen.pressing())
+        delay(10);
+    delay(500);
+    temporary_multiplier = ang / bot.h_deg;
+    temporary_multiplier *= bot.imu_multiplier;
+    bot.imu_multiplier = temporary_multiplier;
+    printf("\ncopy this multiplier into data bot constructor in main: M:%f", temporary_multiplier);
+    }
+}
+
+void outputTune()
+{
     float ss = bot.perpindicular_inch / (20 * M_PI);
     float sr = bot.parallel_inch / (20 * M_PI);
-    printf("\n\n SS:%f SR%f \n\n",ss, sr);
+    printf("\nSS:%f SR%f", ss, sr);
 }
+
+void odomTune(float kp, float ki, float kd, float maxSpeed) {
+    start_auto(0, 0, 0);
+    enable_auto_movement = true;
+    heading_multiplier_step = true;
+    tuneOffsets(3600, kp, ki, kd, maxSpeed, 1);
+    enable_auto_movement = true;
+    heading_multiplier_step = false;
+    bot.setPos(0, 0, 0);
+    delay(3000);
+    tuneOffsets(3600, kp, ki, kd, maxSpeed, 1);
+    outputTune();
+    delay(10000);
+    stop_auto();
+}
+
+
 
 void swing_on_left(float ang, float kp, float ki, float kd, float maxSpeed, float breakang)
 {

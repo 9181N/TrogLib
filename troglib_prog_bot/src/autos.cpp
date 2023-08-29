@@ -7,17 +7,17 @@
 float ykp = .7, yki = 0.0, ykd = 6;
 float hkp = .28, hki = .01, hkd = 3;
 
-void odomTune()
-{ // run twice minimum, first run jig the bot square to a tile and at the end rejig to get imu multiplier (must calculate manually for now)
-    // second time just run it and take the values
-    // for more accuracy continue running and average the values
-    start_auto(0, 0, 0);
-    tuneOffsets(3600, .1, hki, hkd, 3, 1);
-    delay(10000);
-    stop_auto();
-}
+/*
+odomTune(.1, hki, hkd, 3);
+step 1: jig the bot square to a tile
+step 2: run odomtune macro CONTROLLER MUST BE PLUGGED INTO COMPUTER
+step 3: once the robot stops moving rejig it to the tile and tap the brain screen
+step 4: once robot again stops moving go to pc and copy the outputted SS SR and M values into the bot constructor in main
+*/
 void test_auto()
 {
+
+    stop_auto();
 
     straight(24, ykp, yki, ykd, 12, .125, 1);
     delay(300);
