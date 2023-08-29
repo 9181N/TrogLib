@@ -26,7 +26,7 @@ encoder TX = encoder(Brain.ThreeWirePort.G);
 
 
 extern task motor_control;
-  data bot(-0.206901426, -2.636178815, 1.00, true);
+  data bot(0.0586285, -0.0164235, 1.012031935, true);
   PID sweeper_pid(.1,0,0);
   sweeper_class sweep;
   PID drive_pid(0, 0, 0);
@@ -48,8 +48,8 @@ bot.setPos(0,0,0);
 
 void autonomous(void) {
         enable_user_control = false;
-//test_auto();
-prog_skills_15();
+test_auto();
+//prog_skills_15();
 }
 
 

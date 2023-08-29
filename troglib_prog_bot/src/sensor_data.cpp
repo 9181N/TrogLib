@@ -26,7 +26,6 @@ void data::collect_data()
     parallel_inch = deg_to_inch(parallel_deg, 2.75);
     perpindicular_deg = TX.position(vex::deg);
     perpindicular_inch = deg_to_inch(perpindicular_deg, 2.75);
-    linear_speed = parallel_inch / data_cycle_time;
     }
     else {
     parallel_deg = left_drive_motors.position(vex::deg);
@@ -39,6 +38,7 @@ void data::collect_data()
         }
 
     delta_parallel_inch = parallel_inch - last_parallel_inch;
+    linear_speed = hy / (data_cycle_time/1000);
     delta_perpindicular_inch = perpindicular_inch - last_perpindicular_inch;
 }
 
@@ -63,7 +63,6 @@ void data::setPos(float newx, float newy, float newh)
 
 void data::updateOdom()
 {
-    double hy, hx;
     double A = h_rad - last_h_rad;       // change in heading since last cycle
     double R = delta_parallel_inch;      // change in local Y in inches since last cycle
     double S = delta_perpindicular_inch; // change in local X in inches since last cycle

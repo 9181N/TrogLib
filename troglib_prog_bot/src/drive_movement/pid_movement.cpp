@@ -57,7 +57,7 @@ void pid_move::turn()
     auto_left_drive_stopping = 0, auto_right_drive_stopping = 0;
     auto_left_drive_vel = false, auto_right_drive_vel = false;
     float pow = turn_pid.calculate(turn_error_from(bot.h_target));
-
+    if (auto_wrap_turn_target) pow = turn_pid.calculate(bot.h_target - bot.h_deg);
     auto_left_drive_power = pow, auto_right_drive_power = -1 * pow;
 }
 

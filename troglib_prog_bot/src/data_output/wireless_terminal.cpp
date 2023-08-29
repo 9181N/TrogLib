@@ -8,13 +8,13 @@
 #include <iostream>
 #include <string>
 using namespace vex;
-
+bool wireless_terminal_on = true;
 float loop_refresh_time = 100;
-void standard_readout()
+void standardReadout()
 {
-        //sweep.sweep_cycle();
+    // sweep.sweep_cycle();
     printf("\n");
-
+    printf("v:%.2f ", bot.linear_speed);
     printf("tx%.2f ", bot.perpindicular_inch);
     printf("ty%.2f ", bot.parallel_inch);
     printf("X:%.3f ", bot.x);
@@ -27,11 +27,11 @@ void standard_readout()
 }
 
 int counter = 0;
-void xy_coord_pairs()
+void graphingFormat()
 {
-
-   // printf("(%.3f, %.3f),(%.3f, %.3f),", bot.x, bot.y, bot.x_target, bot.y_target);
-    if (counter >= 1)
+    printf("(%.3f, %.3f),", Brain.timer(msec), bot.linear_speed);
+    // printf("(%.3f, %.3f),(%.3f, %.3f),", bot.x, bot.y, bot.x_target, bot.y_target);
+    if (counter >= 2)
     {
         printf("\n");
         counter = 0;
@@ -43,15 +43,22 @@ void xy_coord_pairs()
 }
 void print_to_terminal()
 {
-    //wait(1000, vex::sec);
-     standard_readout();
+    if (wireless_terminal_on)
+    {
+        standardReadout();
 
-    //if(start_time > 0) xy_coord_pairs();
+        // wait(1000, vex::sec);
+        // standardReadout();
+        // graphingFormat();
+        // if(start_time > 0) xy_coord_pairs();
+    }
     std::cout << "" << std::flush;
 }
 
 int wireless_readout_thread()
 {
+    printf("\n");
+    printf("\n");
     while (1)
     {
         print_to_terminal();

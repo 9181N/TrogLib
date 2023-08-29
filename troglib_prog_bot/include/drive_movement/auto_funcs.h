@@ -7,6 +7,8 @@ void stop_auto();
 void delay(float msec);
 void movement_reset();
 void turn_to(float ang, float kp, float ki, float kd, float maxSpeed, float breakang);
+void turnToExplicit(float ang, float kp, float ki, float kd, float maxSpeed, float breakang);
+void tuneOffsets(float ang, float kp, float ki, float kd, float maxSpeed, float breakang);
 void turn_to_xy(float x, float y, float kp, float ki, float kd, float maxSpeed, float breakang, bool backward);
 void swing_on_left(float ang, float kp, float ki, float kd, float maxSpeed, float breakang);
 void swing_on_right(float ang, float kp, float ki, float kd, float maxSpeed, float breakang);

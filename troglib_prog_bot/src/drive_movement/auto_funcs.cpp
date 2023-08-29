@@ -6,6 +6,7 @@
 #include "drive_movement/auto_movement_loop.h"
 #include "vex.h"
 #include "drive_movement/auto_funcs.h"
+#include "data_output/wireless_terminal.h"
 #include "robot_config.h"
 #include <iostream>
 #include <iomanip>
@@ -75,6 +76,32 @@ void turn_to(float ang, float kp, float ki, float kd, float maxSpeed, float brea
         delay(10);
         wait_for_turn_error(breakang);
     }
+}
+
+void turnToExplicit(float ang, float kp, float ki, float kd, float maxSpeed, float breakang)
+{
+    movement_reset();
+    bot.h_target = ang;
+    turn_pid.setConstants(kp, ki, kd), turn_pid.maxOutput = maxSpeed;
+    movement_type_index = 3;
+
+    if (breakang > 0)
+    {
+        delay(10);
+        wait_for_turn_error(breakang);
+    }
+    pid_calc.auto_wrap_turn_target = false;
+}
+
+void tuneOffsets(float ang, float kp, float ki, float kd, float maxSpeed, float breakang)
+{
+    pid_calc.auto_wrap_turn_target = true;
+    turnToExplicit(ang, kp, ki, kd, maxSpeed, breakang);
+    delay(1000);
+    wireless_terminal_on = false;
+    float ss = bot.perpindicular_inch / (20 * M_PI);
+    float sr = bot.parallel_inch / (20 * M_PI);
+    printf("\n\n SS:%f SR%f \n\n",ss, sr);
 }
 
 void swing_on_left(float ang, float kp, float ki, float kd, float maxSpeed, float breakang)
@@ -195,9 +222,9 @@ void straight(float dist, float kp, float ki, float kd, float maxSpeed, float sl
         delay(30);
         while (fabs(pid_calc.straight_pid_error) > breakdist)
         {
-           // printf("%.2f", fabs(pid_calc.straight_pid_error));
-           // std::cout << "\n"
-             //         << std::flush;
+            // printf("%.2f", fabs(pid_calc.straight_pid_error));
+            // std::cout << "\n"
+            //         << std::flush;
             delay(10);
         }
     }

@@ -7,9 +7,17 @@
 float ykp = .7, yki = 0.0, ykd = 6;
 float hkp = .28, hki = .01, hkd = 3;
 
+void odomTune()
+{ // run twice minimum, first run jig the bot square to a tile and at the end rejig to get imu multiplier (must calculate manually for now)
+    // second time just run it and take the values
+    // for more accuracy continue running and average the values
+    start_auto(0, 0, 0);
+    tuneOffsets(3600, .1, hki, hkd, 3, 1);
+    delay(10000);
+    stop_auto();
+}
 void test_auto()
 {
-    start_auto(0, 0, 0);
 
     straight(24, ykp, yki, ykd, 12, .125, 1);
     delay(300);
@@ -32,7 +40,6 @@ void test_auto()
         turn_to_xy(-45, 45, hkp, hki, hkd, 12, 1, true);
         turn_to(0, hkp, hki, hkd, 12, 1);
     */
-    stop_auto();
 }
 
 void prog_skills_15()

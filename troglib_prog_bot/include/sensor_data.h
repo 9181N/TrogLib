@@ -3,6 +3,7 @@ class data
 {
 public:
     double x, y, h_deg, h_rad, last_h_rad;
+    double hy, hx;
     double x_target, y_target, h_target;
     double parallel_deg, parallel_inch, parallel_deg_r, parallel_inch_r, perpindicular_deg, perpindicular_inch;
     double last_parallel_deg, last_parallel_inch, last_perpindicular_deg, last_perpindicular_inch, delta_parallel_inch, delta_perpindicular_inch;
@@ -11,6 +12,7 @@ public:
     bool use_tracking_wheels;
     double imu_multiplier;
     const double data_cycle_time = 10;
+
     data(double ss, double sr, double imu_mult, bool tracking_wheels)
     {
         SS = ss, SR = sr, imu_multiplier = imu_mult, use_tracking_wheels = tracking_wheels;

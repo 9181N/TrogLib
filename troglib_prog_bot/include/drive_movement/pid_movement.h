@@ -6,6 +6,7 @@ public:
     float initial_y_tracker_inches;
     float straight_pid_length;
     float straight_pid_error;
+    bool auto_wrap_turn_target = false;
     double linear_error2d();
     float turn_error_from(float targ);
     void straight();
