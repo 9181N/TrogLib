@@ -8,6 +8,9 @@
 #include "drive_movement/auto_movement_loop.h"
 #include "autos.h"
 #include "drive_movement/sweeper.h"
+
+#include "mkhlib/datatypes.hpp"
+
 using namespace vex;
 brain Brain;
 controller Controller;
