@@ -7,7 +7,7 @@ sq = $(subst $(sp),?,$1)
 
 # default platform and build location
 PLATFORM  = vexv5
-BUILD     = build
+BUILD     = build/15
 
 # version for clang headers
 ifneq ("$(origin HEADERS)", "command line")
