@@ -4,6 +4,7 @@
 
 #include "mkhlib/datatypes.hpp"
 #include "mkhlib/general_sensors.hpp"
+#include "mkhlib/pid.h"
 
 namespace mkhlib {
     class MotionController {
@@ -15,9 +16,11 @@ namespace mkhlib {
                             mkhlib::UnboundAngularTracker *lateral_tracker_ref, mkhlib::UnboundAngularTracker *horizontal_tracker_ref,
                             int inertial_port, double lateral_offset, double horizontal_offset, double lateral_diameter, 
                             double horizontal_diameter) 
-        : inertial(abs(inertial_port))
+        : inertial(abs(inertial_port)), horizontal_tracker(horizontal_tracker_ref), lateral_tracker(lateral_tracker_ref),
+        lateral_PID(0,0,0), angular_PID(0,0,0)
         {
-            lateral_tracker = lateral_tracker_ref;
+            odometry_task = vex::task(odometry_process);
+            auto_task = vex::task(auto_process);
         }
 
         // END CONSTRUCTORS
@@ -30,13 +33,15 @@ namespace mkhlib {
 
         vex::inertial inertial;
 
-        mkhlib::UnboundAngularTracker* lateral_tracker;
+        UnboundAngularTracker* lateral_tracker;
+        UnboundAngularTracker* horizontal_tracker;
 
         // END ELECTRONICS
 
         // PIDS
 
-        
+        PID lateral_PID;
+        PID angular_PID;
 
         // END PIDS
 
@@ -48,6 +53,16 @@ namespace mkhlib {
         // END ODOMETRY VALUES
 
         private:
+
+        // TASK FUNCTIONS
+
+        static int odometry_process();
+        static int auto_process();
+
+        // TASKS
+
+        vex::task odometry_task;
+        vex::task auto_task;
 
         // ODOMETRY CALCULATION CONSTANTS
 
