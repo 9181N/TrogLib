@@ -396,6 +396,7 @@ void straightMP(float dist, float max_speed, float acel, float kp, float ki, flo
 void classicMoveToMP(float x, float y, float max_speed, float hmax, float ykp, float hkp, float acel, float breakLength, bool backwards)
 {
     movement_reset();
+    mp_calc.first = false;
     mp_calc.direction_multiplier = 1;
     if (backwards)  mp_calc.direction_multiplier = -1;
     mp_calc.acel = acel, mp_calc.dist = mp_calc.linearError2D(), mp_calc.max_speed = max_speed;

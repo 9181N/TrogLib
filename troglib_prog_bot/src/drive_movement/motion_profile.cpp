@@ -33,19 +33,24 @@ float MP_move::acelDist(float initial_v, float final_v, float a)
 
 float MP_move::mp_1d_speed(float dist, float max_v, float acel, bool adaptive)
 {
-    if (adaptive) error = linearError2D();
-    else error = (initial_y_tracker_inches + dist) - bot.parallel_inch;
+    if (adaptive)
+        error = (linearError2D());
+    else
+        error = (initial_y_tracker_inches + dist) - bot.parallel_inch;
     travelled = fabs(bot.parallel_inch - initial_y_tracker_inches); // current distance travelled
     dist = fabs(dist);
     float acel_dist = acelDist(max_v, 0, acel);
     if (2 * acel_dist > dist)
-    acel_dist = dist/2;
+        acel_dist = dist / 2;
 
+        printf("\n\n\n\n");
+        printf("pd");
 
     if (fabs(error) < mp_disable_length)
     {
         left_pow = drive_pid.calculate(error);
         right_pow = left_pow;
+        printf("pd");
     }
 
     else
@@ -54,19 +59,22 @@ float MP_move::mp_1d_speed(float dist, float max_v, float acel, bool adaptive)
         {
             current_target_acel = acel * direction_multiplier;
             pow = direction_multiplier * sqrt(fabs(2 * acel * travelled));
-            //printf("\n acel pow: %f", pow);
+            // printf("\n acel pow: %f", pow);
+            printf("acel ");
         }
         else if (fabs(error) > acel_dist) // coast portion
         {
             pow = max_v * direction_multiplier;
             current_target_acel = 0;
-            //printf("\n coast pow: %f", pow);
+            // printf("\n coast pow: %f", pow);
+            printf("coast ");
         }
         else
         {
             pow = direction_multiplier * sqrt(fabs(2 * acel * error));
             current_target_acel = acel * -1 * direction_multiplier;
-            //printf("\n decel pow: %f", pow);
+            // printf("\n decel pow: %f", pow);
+            printf("decel ");
         }
 
         left_pow = left_side_drive.motor_power(pow, current_target_acel, bot.left_linear_speed);
@@ -74,6 +82,7 @@ float MP_move::mp_1d_speed(float dist, float max_v, float acel, bool adaptive)
     }
     if (fabs(error) > mp_disable_length && fabs(left_pow) <= 1.5)
         left_pow = 1.5 * direction_multiplier, right_pow = 1.5 * direction_multiplier;
+    printf("   LP:%7.3f  ", left_pow);
 
     output = pow;
     return pow;
@@ -93,24 +102,37 @@ void MP_move::classicToPoint()
     auto_left_drive_vel = false, auto_right_drive_vel = false;
     float xy_error_length = bot.point_distance(bot.x, bot.y, bot.x_target, bot.y_target);
     mp_1d_speed(dist, max_speed, acel, true);
+    // printf("\n\nLP:%7.3f  RP:%7.3f", left_pow, right_pow);
     bot.h_target = bot.point_angle(bot.x, bot.y, bot.x_target, bot.y_target);
     float hpow = 0;
+    float h_error = TurnErrorFrom(bot.h_target);
+    float h_error_backwards = TurnErrorFrom(bot.h_target + 180);
+    // printf("\n xy_e %.3f", xy_error_length);
+    // printf("     x_t %.3f y_t %.3f", bot.x_target, bot.y_target);
+
     if (!backwards_move)
-        hpow = turn_pid.calculate(TurnErrorFrom(bot.h_target));
+        hpow = turn_pid.calculate(h_error);
+    // printf("\n !backwards %f", hpow);
     else
     {
-        hpow = turn_pid.calculate(TurnErrorFrom(bot.h_target + 180));
+        hpow = turn_pid.calculate(h_error_backwards);
+        // printf("\n backwards %f", hpow);
     }
-        //printf("\n (%.3f, %.3f)", bot.x_target, bot.y_target);
 
-    if (fabs(bot.relativeangle(bot.x, bot.y, bot.x_target, bot.y_target)) > classic_turn_margin && xy_error_length > turn_disable_distance)
+    if (fabs(h_error) > classic_turn_margin && xy_error_length > turn_disable_distance && !backwards_move)
     {
+        // printf("\n spot turn");
+        auto_left_drive_power = hpow;
+        auto_right_drive_power = -1 * hpow;
+    }
+    else if (fabs(h_error_backwards) > classic_turn_margin && xy_error_length > turn_disable_distance && backwards_move)
+    {
+        // printf("\n B spot turn");
         auto_left_drive_power = hpow;
         auto_right_drive_power = -1 * hpow;
     }
     else if (xy_error_length > turn_disable_distance)
     {
-
         auto_left_drive_power = left_pow + hpow,
         auto_right_drive_power = right_pow - hpow;
         first = true;
@@ -136,5 +158,6 @@ void MP_move::classicToPoint()
     {
         auto_left_drive_power = left_pow, auto_right_drive_power = right_pow;
     }
-        printf("\n (%.3f, %.3f)", auto_left_drive_power, auto_right_drive_power);
+    // printf("\n (%.3f, %.3f)", auto_left_drive_power, auto_right_drive_power);
+    // printf("\n (L:%.3f, R:%.3f)", auto_left_drive_power, auto_right_drive_power);
 }

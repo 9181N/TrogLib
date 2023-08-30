@@ -2,10 +2,8 @@
 
 class MP_move
 {
-private:
-    bool first = false;
-
 public:
+    bool first = false;
     float turn_disable_distance = 5;
     float classic_turn_margin = 80;
     float mp_disable_length = 4;

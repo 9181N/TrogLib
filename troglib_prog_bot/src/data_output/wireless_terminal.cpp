@@ -17,17 +17,22 @@ float loop_refresh_time = 20;
 void standardReadout()
 {
     // sweep.sweep_cycle();
-    printf("\n");
-    printf("v:%.2f ", bot.linear_speed);
-    printf("tx%.2f ", bot.perpindicular_inch);
-    printf("ty%.2f ", bot.parallel_inch);
-    printf("X:%.3f ", bot.x);
-    printf("Y:%.3f ", bot.y);
-    printf("H:%.3f ", bot.h_deg);
-    printf("xt%.2f ", bot.x_target);
-    printf("yt%.2f ", bot.y_target);
-    printf("T%.2f ", (Brain.timer(msec) - start_time) / 1000);
-    printf("ET%.2f ", (end_time) / 1000);
+    printf("\n\n");
+    //printf("v:%.2f ", bot.linear_speed);
+    //printf("tx%.2f ", bot.perpindicular_inch);
+    //printf("ty%.2f ", bot.parallel_inch);
+    printf("T:%7.3f  ", mp_calc.travelled);
+    printf("E:%7.3f  ", mp_calc.error);
+    printf("X:%7.3f  ", bot.x);
+    printf("Y:%7.3f  ", bot.y);
+    printf("H:%7.3f  ", bot.h_deg);
+    printf("xt%7.2f  ", bot.x_target);
+    printf("yt%7.2f  ", bot.y_target);
+    printf("ht%7.2f  ", bot.h_target);
+    printf("L%7.2f  ", bot.point_distance(bot.x, bot.y, bot.x_target, bot.y_target));
+
+    //printf("T%7.2f ", (Brain.timer(msec) - start_time) / 1000);
+    //printf("ET%7.2f ", (end_time) / 1000);
 }
 
 int counter = 0;

@@ -18,10 +18,10 @@ void test_auto()
 {
 
     start_auto(0,0,0);
-    classicMoveToMP(30, 30, 35, 12, ykp, hkp*.3, 10, 1, false);
+    classicMoveToMP(0, -30, 35, 12, ykp, hkp*.3, 10, 1, true);
     printf("\n\n\n\nfirst\n\n\n\n\n");
     delay(500);
-    classicMoveToMP(0, 0, 35, 12, ykp, hkp*.3, 10, 1, true);
+    classicMoveToMP(0, 0, 35, 12, ykp, hkp*.3, 10, 1, false);
     printf("second");
     delay(500);
     turn_to(0, hkp, hki, hkd, 12, 3);
