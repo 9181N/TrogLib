@@ -8,15 +8,18 @@
 #include "drive_movement/auto_movement_loop.h"
 #include "autos.h"
 #include "drive_movement/sweeper.h"
+#include "drive_movement/motion_profile.h"
+#include "drive_movement/velo_controller.h"
+
 using namespace vex;
 brain Brain;
 controller Controller;
 competition Competition;
 
-motor ls_front = motor(PORT8, ratio18_1, true);
-motor ls_back = motor(PORT10, ratio18_1, true);
-motor rs_front = motor(PORT18, ratio18_1, false);
-motor rs_back = motor(PORT19, ratio18_1, false);
+motor ls_front = motor(PORT8, ratio6_1, true);
+motor ls_back = motor(PORT10, ratio6_1, true);
+motor rs_front = motor(PORT18, ratio6_1, false);
+motor rs_back = motor(PORT19, ratio6_1, false);
 
 motor_group left_drive_motors = motor_group(ls_front, ls_back);
 motor_group right_drive_motors = motor_group(rs_front, rs_back);
@@ -26,12 +29,16 @@ encoder TX = encoder(Brain.ThreeWirePort.G);
 
 
 extern task motor_control;
+
+
   data bot(0.0586285, -0.0164235, 1.011868, true);
   PID sweeper_pid(.1,0,0);
   sweeper_class sweep;
   PID drive_pid(0, 0, 0);
   PID turn_pid(0, 0, 0);
-  
+  MP_move mp_calc;
+  velo_controller left_side_drive(0.17, 0.025, 0.025, 0); //0.02 ka 0.03 kd
+  velo_controller right_side_drive(0.17, 0.025, 0.025, 0); 
 int odometry_thread_wrapper() {
   bot.odom_thread();
   return 0;

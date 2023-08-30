@@ -6,6 +6,8 @@
 #include "drive_movement/auto_movement_loop.h"
 #include "vex.h"
 #include "drive_movement/auto_funcs.h"
+#include "drive_movement/motion_profile.h"
+#include "drive_movement/velo_controller.h"
 #include "data_output/wireless_terminal.h"
 #include "data_output/brain_screen.h"
 #include "robot_config.h"
@@ -104,14 +106,15 @@ void tuneOffsets(float ang, float kp, float ki, float kd, float maxSpeed, float 
     delay(1000);
     enable_auto_movement = false;
     left_drive(0, 0, 0), right_drive(0, 0, 0);
-    if (heading_multiplier_step) {
-    while (!Brain.Screen.pressing())
-        delay(10);
-    delay(500);
-    temporary_multiplier = ang / bot.h_deg;
-    temporary_multiplier *= bot.imu_multiplier;
-    bot.imu_multiplier = temporary_multiplier;
-    printf("\ncopy this multiplier into data bot constructor in main: M:%f", temporary_multiplier);
+    if (heading_multiplier_step)
+    {
+        while (!Brain.Screen.pressing())
+            delay(10);
+        delay(500);
+        temporary_multiplier = ang / bot.h_deg;
+        temporary_multiplier *= bot.imu_multiplier;
+        bot.imu_multiplier = temporary_multiplier;
+        printf("\ncopy this multiplier into data bot constructor in main: M:%f", temporary_multiplier);
     }
 }
 
@@ -122,7 +125,8 @@ void outputTune()
     printf("\nSS:%f SR%f", ss, sr);
 }
 
-void odomTune(float kp, float ki, float kd, float maxSpeed) {
+void odomTune(float kp, float ki, float kd, float maxSpeed)
+{
     start_auto(0, 0, 0);
     enable_auto_movement = true;
     heading_multiplier_step = true;
@@ -136,8 +140,6 @@ void odomTune(float kp, float ki, float kd, float maxSpeed) {
     delay(10000);
     stop_auto();
 }
-
-
 
 void swing_on_left(float ang, float kp, float ki, float kd, float maxSpeed, float breakang)
 {
@@ -349,4 +351,33 @@ void classic_move_to(float x, float y, float ymax, float hmax, float ykp, float 
     {
         wait_for_break_length(breakLength);
     }
+}
+
+void straightMP(float dist, float max_speed, float acel, float kp, float ki, float kd, float breakdist)
+{
+    movement_reset();
+    mp_calc.direction_multiplier = left_side_drive.signum(dist);
+    mp_calc.acel = acel, mp_calc.dist = dist, mp_calc.max_speed = max_speed;
+    bot.x_target = bot.x;
+    bot.y_target = bot.y;
+    bot.h_target = bot.h_deg;
+    mp_calc.initial_y_tracker_inches = bot.parallel_inch;
+    drive_pid.setConstants(kp, ki, kd);
+    drive_pid.maxOutput = 12;
+    drive_pid.slewAmount = 12;
+    movement_type_index = 11;
+    if (breakdist > 0)
+    {
+        delay(200);
+        while (fabs(mp_calc.error) > breakdist)
+        {
+            // printf("%.2f", fabs(pid_calc.straight_pid_error));
+            // std::cout << "\n"
+            //         << std::flush;
+            delay(10);
+        }
+    }
+    bot.x_target = bot.x;
+    bot.y_target = bot.y;
+    bot.h_target = bot.h_deg;
 }

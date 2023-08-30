@@ -5,6 +5,8 @@
 #include "drive_movement/pid_movement.h"
 #include "drive_movement/sweeper.h"
 #include "drive_movement/pid.h"
+#include "drive_movement/motion_profile.h"
+#include "drive_movement/auto_movement_loop.h"
 #include <iostream>
 #include <string>
 using namespace vex;
@@ -29,8 +31,10 @@ void standardReadout()
 int counter = 0;
 void graphingFormat()
 {
-    printf("(%.3f, %.3f),", bot.x, bot.y);
-    //printf("(%.3f, %.3f),", Brain.timer(msec), bot.linear_speed);
+    printf("(%.3f, %.3f),", float(Brain.timer(msec) - start_time) / 1000, mp_calc.output);
+    printf("(%.3f, %.3f),", float(Brain.timer(msec) - start_time) / 1000, bot.linear_speed);
+
+    //printf("(%.3f, %.3f),", float(Brain.timer(msec) - start_time) / 1000, mp_calc.error);
     // printf("(%.3f, %.3f),(%.3f, %.3f),", bot.x, bot.y, bot.x_target, bot.y_target);
     if (counter >= 2)
     {
@@ -49,8 +53,8 @@ void print_to_terminal()
         //standardReadout();
 
         // wait(1000, vex::sec);
-         graphingFormat();
-        // if(start_time > 0) xy_coord_pairs();
+         //graphingFormat();
+        if(start_time > 0 && end_time == 0) graphingFormat();
     }
     std::cout << "" << std::flush;
 }

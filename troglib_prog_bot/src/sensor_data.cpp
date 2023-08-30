@@ -36,9 +36,15 @@ void data::collect_data()
     perpindicular_deg = 0;
     perpindicular_inch = 0;
         }
-
     delta_parallel_inch = parallel_inch - last_parallel_inch;
-    linear_speed = hy / (data_cycle_time/1000);
+    float left_rpm = left_drive_motors.velocity(vex::rpm) * 3/5;
+    float left_deg_s = left_rpm * 360 / 60;
+    float right_rpm = right_drive_motors.velocity(vex::rpm) * 3/5;
+    float right_deg_s = right_rpm * 360 / 60;
+     left_linear_speed = deg_to_inch(left_deg_s, 3.25);
+     right_linear_speed = deg_to_inch(right_deg_s, 3.25);
+    linear_speed = (left_linear_speed + right_linear_speed)/2;
+    //linear_speed = hy / (data_cycle_time/1000);
     delta_perpindicular_inch = perpindicular_inch - last_perpindicular_inch;
 }
 

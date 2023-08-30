@@ -16,6 +16,11 @@ step 4: once robot again stops moving go to pc and copy the outputted SS SR and 
 */
 void test_auto()
 {
+    start_auto(0,0,0);
+    straightMP(60, 60, 20, ykp, yki, ykd, 1);
+    delay(500);
+    straightMP(-60, 60, 20, ykp, yki, ykd, 1);
+    delay(500);
 
     stop_auto();
 

@@ -1,5 +1,6 @@
 #include "motor_controller.h"
 #include "drive_movement/pid_movement.h"
+#include "drive_movement/motion_profile.h"
 #include "vex.h"
 #include <iostream>
 bool enable_auto_movement = false;
@@ -29,8 +30,8 @@ case 7: pid_calc.swing_turn_to_xy_on_left(); break;
 case 8: pid_calc.swing_turn_to_xy_on_right(); break;
 case 9: pid_calc.straight_heading_to_point(); break;
 case 10: pid_calc.classic_to_point(); break;
-/*case 11: PPSCalcBackward(); break;
-case 12: PPSBezierCalc(); break;
+case 11: mp_calc.straight(); break;
+/*case 12: PPSBezierCalc(); break;
 case 13: simplePPSBezierCalc(); break;
 case 14: backwardsPPSBezierCalc(); break;
 case 15: simplePPSBezierCalcBackward(); break;

@@ -6,8 +6,7 @@
 #include "motor_controller.h"
 #include "drive_movement/auto_movement_loop.h"
 #include "vex.h"
-
-MP_move mp_calc;
+#include "drive_movement/velo_controller.h"
 
 double MP_move::linearError2D()
 {
@@ -24,27 +23,68 @@ float MP_move::TurnErrorFrom(float targ)
 float MP_move::acelDist(float initial_v, float final_v, float a)
 {
     // vf^2 = vi^2 + 2ad
+    // vi^2 = vf^2 - 2ad   vf = 0 so vi =  -1 * sqrt(fabs(2ad)
     // d = (vf^2-vi^2)/2a
     float vf_sqd = final_v * final_v;
     float vi_sqd = initial_v * initial_v;
     float dist = (vf_sqd - vi_sqd) / (2 * a);
-    return dist;
+    return fabs(dist);
 }
 
-float MP_move::mp_1d_speed(float dist, float max_v, float a)
+float MP_move::mp_1d_speed(float dist, float max_v, float acel)
 {
-    float target_dist = linearError2D();
-    float decel_dist = acelDist(max_v, 0, a);
-    if (target_dist < decel_dist)
+    error = (initial_y_tracker_inches + dist) - bot.parallel_inch;
+    travelled = fabs(bot.parallel_inch - initial_y_tracker_inches); // current distance travelled
+    dist = fabs(dist);
+    float acel_dist = acelDist(max_v, 0, acel);
+    float pow = 0, left_pow = 0, right_pow;
+    if (2 * acel_dist > dist)
+    acel_dist = dist/2;
+
+
+    if (fabs(error) < mp_disable_length)
     {
-        // decel
+        left_pow = drive_pid.calculate(error);
+        right_pow = left_pow;
     }
+
     else
     {
-        // acel
+        if (travelled < acel_dist) // acel portion
+        {
+            current_target_acel = acel * direction_multiplier;
+            pow = direction_multiplier * sqrt(fabs(2 * acel * travelled));
+            //printf("\n acel pow: %f", pow);
+        }
+        else if (travelled < dist - acel_dist)
+        {
+            pow = max_v * direction_multiplier;
+            current_target_acel = 0;
+            //printf("\n coast pow: %f", pow);
+        }
+        else
+        {
+            pow = direction_multiplier * sqrt(fabs(2 * acel * error));
+            current_target_acel = acel * -1 * direction_multiplier;
+            //printf("\n decel pow: %f", pow);
+        }
+
+        left_pow = left_side_drive.motor_power(pow, current_target_acel, bot.left_linear_speed);
+        right_pow = right_side_drive.motor_power(pow, current_target_acel, bot.right_linear_speed);
     }
-    float pow = 0;
+    if (fabs(error) > mp_disable_length && fabs(left_pow) <= 1.5)
+        left_pow = 1.5 * direction_multiplier, right_pow = 1.5 * direction_multiplier;
+
+    auto_left_drive_power = left_pow, auto_right_drive_power = right_pow;
+    output = pow;
     return pow;
+}
+
+void MP_move::straight()
+{
+    auto_left_drive_stopping = 1, auto_right_drive_stopping = 1;
+    auto_left_drive_vel = false, auto_right_drive_vel = false;
+    mp_1d_speed(dist, max_speed, acel);
 }
 
 void MP_move::classicToPoint()

@@ -17,3 +17,4 @@ void swing_on_right(float ang, float kp, float ki, float kd, float maxSpeed, flo
 void straight(float dist, float kp, float ki, float kd, float maxSpeed, float slew, float breakdist);
 void straight_with_heading(float dist, float heading, float ykp, float yki, float ykd, float hkp, float hkd, float maxSpeed, float hmaxspeed, float slew, float breakdist);
 void classic_move_to(float x, float y, float ymax, float hmax, float ykp, float hkp, float slew, float breakLength, bool backwards);
+void straightMP(float dist, float max_speed, float acel, float kp, float ki, float kd, float breakdist);
