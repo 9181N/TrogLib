@@ -1,3 +1,5 @@
+#pragma once
+
 #include <vector>
 #include "v5.h"
 #include "v5_vcs.h"
@@ -17,7 +19,8 @@ namespace mkhlib {
                             int inertial_port, double lateral_offset, double horizontal_offset, double lateral_diameter, 
                             double horizontal_diameter) 
         : inertial(abs(inertial_port)), horizontal_tracker(horizontal_tracker_ref), lateral_tracker(lateral_tracker_ref),
-        lateral_PID(0,0,0), angular_PID(0,0,0)
+        lateral_PID(0,0,0), angular_PID(0,0,0), lateral_tracker_offset(lateral_offset), lateral_wheel_diameter(lateral_diameter),
+        horizontal_tracker_offset(horizontal_offset), horizontal_wheel_diameter(horizontal_diameter)
         {
             odometry_task = vex::task(odometry_process);
             auto_task = vex::task(auto_process);
@@ -59,10 +62,14 @@ namespace mkhlib {
         static int odometry_process();
         static int auto_process();
 
+        // END TASK FUNCTIONS
+
         // TASKS
 
         vex::task odometry_task;
         vex::task auto_task;
+
+        // END TASKS
 
         // ODOMETRY CALCULATION CONSTANTS
 
