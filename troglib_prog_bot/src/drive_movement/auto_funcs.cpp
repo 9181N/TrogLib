@@ -67,6 +67,15 @@ void wait_for_break_length(float error)
     }
 }
 
+void wait_for_break_length2(float error)
+{
+    while (bot.point_distance(bot.x, bot.y, bot.x_target, bot.y_target) > mp_calc.turn_disable_distance or mp_calc.linearError2D() > error)
+    {
+        //printf("\n waiting...");
+        delay(10);
+    }
+}
+
 void turn_to(float ang, float kp, float ki, float kd, float maxSpeed, float breakang)
 {
     movement_reset();
@@ -380,4 +389,28 @@ void straightMP(float dist, float max_speed, float acel, float kp, float ki, flo
     bot.x_target = bot.x;
     bot.y_target = bot.y;
     bot.h_target = bot.h_deg;
+}
+
+
+
+void classicMoveToMP(float x, float y, float max_speed, float hmax, float ykp, float hkp, float acel, float breakLength, bool backwards)
+{
+    movement_reset();
+    mp_calc.direction_multiplier = 1;
+    if (backwards)  mp_calc.direction_multiplier = -1;
+    mp_calc.acel = acel, mp_calc.dist = mp_calc.linearError2D(), mp_calc.max_speed = max_speed;
+    mp_calc.initial_y_tracker_inches = bot.parallel_inch;
+    backwards_move = backwards;
+    bot.x_target = x;
+    bot.y_target = y;
+    turn_pid.maxOutput = hmax;
+    drive_pid.maxOutput = 12;
+    drive_pid.slewAmount = 12;
+    drive_pid.setConstants(ykp, drive_pid.ki, drive_pid.kd);
+    turn_pid.setConstants(hkp, 0, turn_pid.kd);
+    movement_type_index = 12;
+    if (breakLength > 0)
+    {
+        wait_for_break_length2(breakLength);
+    }
 }

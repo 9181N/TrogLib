@@ -125,6 +125,7 @@ void pid_move::classic_to_point()
     auto_left_drive_stopping = 0, auto_right_drive_stopping = 0;
     auto_left_drive_vel = false, auto_right_drive_vel = false;
     bot.h_target = bot.point_angle(bot.x, bot.y, bot.x_target, bot.y_target);
+    float xy_error_length = bot.point_distance(bot.x, bot.y, bot.x_target, bot.y_target);
     float hpow = 0;
     if (!backwards_move)
         hpow = turn_pid.calculate(turn_error_from(bot.h_target));
@@ -133,12 +134,12 @@ void pid_move::classic_to_point()
     }
 
     float ypow = drive_pid.calculate(linear_error2d());
-    if (fabs(bot.relativeangle(bot.x, bot.y, bot.x_target, bot.y_target)) > classic_turn_margin && linear_error2d() > 5)
+    if (fabs(bot.relativeangle(bot.x, bot.y, bot.x_target, bot.y_target)) > classic_turn_margin && xy_error_length > 5)
     {
         auto_left_drive_power = hpow;
         auto_right_drive_power = -1 * hpow;
     }
-    else if (fabs(linear_error2d()) > turn_disable_distance)
+    else if (xy_error_length > turn_disable_distance)
     {
         auto_left_drive_power = ypow + hpow,
         auto_right_drive_power = ypow - hpow;
@@ -147,12 +148,12 @@ void pid_move::classic_to_point()
     else if (first == 1)
     {
         if (backwards_move) {
-        bot.x_target = bot.x + bot.vector_x_length_at_theta(bot.h_deg + 180, bot.point_distance(bot.x, bot.y, bot.x_target, bot.y_target));
-        bot.y_target = bot.y + bot.vector_y_length_at_theta(bot.h_deg + 180, bot.point_distance(bot.x, bot.y, bot.x_target, bot.y_target));
+        bot.x_target = bot.x + bot.vector_x_length_at_theta(bot.h_deg + 180, xy_error_length);
+        bot.y_target = bot.y + bot.vector_y_length_at_theta(bot.h_deg + 180, xy_error_length);
         }
         if (!backwards_move) {
-        bot.x_target = bot.x + bot.vector_x_length_at_theta(bot.h_deg, bot.point_distance(bot.x, bot.y, bot.x_target, bot.y_target));
-        bot.y_target = bot.y + bot.vector_y_length_at_theta(bot.h_deg, bot.point_distance(bot.x, bot.y, bot.x_target, bot.y_target));
+        bot.x_target = bot.x + bot.vector_x_length_at_theta(bot.h_deg, xy_error_length);
+        bot.y_target = bot.y + bot.vector_y_length_at_theta(bot.h_deg, xy_error_length);
         }
 
         auto_left_drive_power = ypow, auto_right_drive_power = ypow;

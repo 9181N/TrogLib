@@ -16,12 +16,27 @@ step 4: once robot again stops moving go to pc and copy the outputted SS SR and 
 */
 void test_auto()
 {
+
     start_auto(0,0,0);
-    straightMP(60, 60, 150, ykp, yki, ykd, 1);
+    classicMoveToMP(30, 30, 35, 12, ykp, hkp*.3, 10, 1, false);
+    printf("\n\n\n\nfirst\n\n\n\n\n");
     delay(500);
-    straightMP(-60, 60, 150, ykp, yki, ykd, 1);
+    classicMoveToMP(0, 0, 35, 12, ykp, hkp*.3, 10, 1, true);
+    printf("second");
+    delay(500);
+    turn_to(0, hkp, hki, hkd, 12, 3);
+    stop_auto();
+
+    straightMP(60, 69, 150, ykp, yki, ykd, 1);
+    delay(500);
+    straightMP(-60, 69, 150, ykp, yki, ykd, 1);
     delay(500);
 
+
+
+    start_auto(0,0,0);
+    classic_move_to(30, 30, 8, 12, ykp, hkp * .3, .125, 4, false);
+    classic_move_to(0, 0, 8, 12, ykp, hkp * .3, .125, 4, false);
     stop_auto();
 
     straight(24, ykp, yki, ykd, 12, .125, 1);

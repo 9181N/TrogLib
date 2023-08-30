@@ -31,13 +31,13 @@ float MP_move::acelDist(float initial_v, float final_v, float a)
     return fabs(dist);
 }
 
-float MP_move::mp_1d_speed(float dist, float max_v, float acel)
+float MP_move::mp_1d_speed(float dist, float max_v, float acel, bool adaptive)
 {
-    error = (initial_y_tracker_inches + dist) - bot.parallel_inch;
+    if (adaptive) error = linearError2D();
+    else error = (initial_y_tracker_inches + dist) - bot.parallel_inch;
     travelled = fabs(bot.parallel_inch - initial_y_tracker_inches); // current distance travelled
     dist = fabs(dist);
     float acel_dist = acelDist(max_v, 0, acel);
-    float pow = 0, left_pow = 0, right_pow;
     if (2 * acel_dist > dist)
     acel_dist = dist/2;
 
@@ -56,7 +56,7 @@ float MP_move::mp_1d_speed(float dist, float max_v, float acel)
             pow = direction_multiplier * sqrt(fabs(2 * acel * travelled));
             //printf("\n acel pow: %f", pow);
         }
-        else if (travelled < dist - acel_dist)
+        else if (fabs(error) > acel_dist) // coast portion
         {
             pow = max_v * direction_multiplier;
             current_target_acel = 0;
@@ -75,7 +75,6 @@ float MP_move::mp_1d_speed(float dist, float max_v, float acel)
     if (fabs(error) > mp_disable_length && fabs(left_pow) <= 1.5)
         left_pow = 1.5 * direction_multiplier, right_pow = 1.5 * direction_multiplier;
 
-    auto_left_drive_power = left_pow, auto_right_drive_power = right_pow;
     output = pow;
     return pow;
 }
@@ -84,13 +83,16 @@ void MP_move::straight()
 {
     auto_left_drive_stopping = 1, auto_right_drive_stopping = 1;
     auto_left_drive_vel = false, auto_right_drive_vel = false;
-    mp_1d_speed(dist, max_speed, acel);
+    mp_1d_speed(dist, max_speed, acel, false);
+    auto_left_drive_power = left_pow, auto_right_drive_power = right_pow;
 }
 
 void MP_move::classicToPoint()
 {
-    auto_left_drive_stopping = 0, auto_right_drive_stopping = 0;
+    auto_left_drive_stopping = 1, auto_right_drive_stopping = 1;
     auto_left_drive_vel = false, auto_right_drive_vel = false;
+    float xy_error_length = bot.point_distance(bot.x, bot.y, bot.x_target, bot.y_target);
+    mp_1d_speed(dist, max_speed, acel, true);
     bot.h_target = bot.point_angle(bot.x, bot.y, bot.x_target, bot.y_target);
     float hpow = 0;
     if (!backwards_move)
@@ -99,44 +101,40 @@ void MP_move::classicToPoint()
     {
         hpow = turn_pid.calculate(TurnErrorFrom(bot.h_target + 180));
     }
+        //printf("\n (%.3f, %.3f)", bot.x_target, bot.y_target);
 
-    float ypow = drive_pid.calculate(linearError2D());
-    if (fabs(bot.relativeangle(bot.x, bot.y, bot.x_target, bot.y_target)) > classic_turn_margin && linearError2D() > 5)
+    if (fabs(bot.relativeangle(bot.x, bot.y, bot.x_target, bot.y_target)) > classic_turn_margin && xy_error_length > turn_disable_distance)
     {
         auto_left_drive_power = hpow;
         auto_right_drive_power = -1 * hpow;
     }
-    else if (fabs(linearError2D()) > turn_disable_distance)
+    else if (xy_error_length > turn_disable_distance)
     {
-        auto_left_drive_power = ypow + hpow,
-        auto_right_drive_power = ypow - hpow;
+
+        auto_left_drive_power = left_pow + hpow,
+        auto_right_drive_power = right_pow - hpow;
         first = true;
     }
     else if (first == 1)
     {
         if (backwards_move)
         {
-            bot.x_target = bot.x + bot.vector_x_length_at_theta(bot.h_deg + 180, bot.point_distance(bot.x, bot.y, bot.x_target, bot.y_target));
-            bot.y_target = bot.y + bot.vector_y_length_at_theta(bot.h_deg + 180, bot.point_distance(bot.x, bot.y, bot.x_target, bot.y_target));
+            bot.x_target = bot.x + bot.vector_x_length_at_theta(bot.h_deg + 180, xy_error_length);
+            bot.y_target = bot.y + bot.vector_y_length_at_theta(bot.h_deg + 180, xy_error_length);
         }
         if (!backwards_move)
         {
-            bot.x_target = bot.x + bot.vector_x_length_at_theta(bot.h_deg, bot.point_distance(bot.x, bot.y, bot.x_target, bot.y_target));
-            bot.y_target = bot.y + bot.vector_y_length_at_theta(bot.h_deg, bot.point_distance(bot.x, bot.y, bot.x_target, bot.y_target));
+            bot.x_target = bot.x + bot.vector_x_length_at_theta(bot.h_deg, xy_error_length);
+            bot.y_target = bot.y + bot.vector_y_length_at_theta(bot.h_deg, xy_error_length);
         }
 
-        auto_left_drive_power = ypow, auto_right_drive_power = ypow;
+        auto_left_drive_power = left_pow, auto_right_drive_power = right_pow;
 
         first = false;
     }
     else
     {
-        auto_left_drive_power = ypow, auto_right_drive_power = ypow;
+        auto_left_drive_power = left_pow, auto_right_drive_power = right_pow;
     }
-
-    /*  printf("\n\n");
-  printf("LE %5.2f", linear_error2d());
-  printf("\n");
-  printf("P %5.2f", turn_disable_distance);
-*/
+        printf("\n (%.3f, %.3f)", auto_left_drive_power, auto_right_drive_power);
 }

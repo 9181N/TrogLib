@@ -1,13 +1,13 @@
-#pragma once;
+#pragma once
 
 class MP_move
 {
-    private:
-float turn_disable_distance = 5;
-float classic_turn_margin = 80;
+private:
+    bool first = false;
 
-bool first;
 public:
+    float turn_disable_distance = 5;
+    float classic_turn_margin = 80;
     float mp_disable_length = 4;
     float initial_y_tracker_inches;
     float straight_mp_length;
@@ -18,10 +18,11 @@ public:
     float acel, dist, max_speed;
     float current_target_acel;
     float output;
+    float pow = 0, left_pow = 0, right_pow = 0;
     double linearError2D();
     float TurnErrorFrom(float targ);
     float acelDist(float initial_v, float final_v, float a);
-    float mp_1d_speed(float dist, float max_v, float acel);
+    float mp_1d_speed(float dist, float max_v, float acel, bool adaptive);
     void straight();
     void classicToPoint();
 };
