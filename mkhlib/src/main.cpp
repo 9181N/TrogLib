@@ -14,6 +14,10 @@
 
 vex::brain Brain;
 
+mkhlib::UnboundRotationSensor lateral(1);
+
+mkhlib::UnboundOpticalEncoder horizontal(Brain.ThreeWirePort.A, false);
+
 mkhlib::MotionController movehammadAli(
     // ELECTRONICS
 
@@ -25,10 +29,10 @@ mkhlib::MotionController movehammadAli(
     {1, 2, 3}, 
     
     // Lateral encoder reference 
-    &mkhlib::UnboundRotationSensor(1), 
+    &lateral, 
     
     // Horizontal encoder reference
-    &mkhlib::UnboundOpticalEncoder(Brain.ThreeWirePort.A, false), 
+    &horizontal, 
     
     // Inertial sensor port
     1,

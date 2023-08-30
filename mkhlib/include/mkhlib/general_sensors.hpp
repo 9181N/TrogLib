@@ -10,8 +10,8 @@ namespace mkhlib {
 
         public:
 
-        virtual void set_value(double value, vex::rotationUnits units);
-        virtual double get_value(vex::rotationUnits units);
+        virtual void set_value(double value, vex::rotationUnits units) = 0;
+        virtual double get_value(vex::rotationUnits units) = 0;
         
     };
 
@@ -20,8 +20,8 @@ namespace mkhlib {
 
         public:
 
-        virtual void set_value(Angle value);
-        virtual Angle get_value();
+        virtual void set_value(Angle value) = 0;
+        virtual Angle get_value() = 0;
     };
 
     class UnboundRotationSensor : public UnboundAngularTracker {
