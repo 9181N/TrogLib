@@ -13,7 +13,7 @@ public:
     float error;
     float travelled;
     bool decellerating = false;
-    float acel, dist, max_speed;
+    float acel, dist, max_speed, initial_dist;
     float current_target_acel;
     float output;
     float pow = 0, left_pow = 0, right_pow = 0;

@@ -69,10 +69,13 @@ void wait_for_break_length(float error)
 
 void wait_for_break_length2(float error)
 {
-    while (bot.point_distance(bot.x, bot.y, bot.x_target, bot.y_target) > mp_calc.turn_disable_distance or mp_calc.linearError2D() > error)
+    while (1)
     {
-        //printf("\n waiting...");
-        delay(10);
+    float e = bot.point_distance(bot.x, bot.y, bot.x_target, bot.y_target);
+    float margin = mp_calc.turn_disable_distance;
+    float normalised_e = fabs(mp_calc.linearError2D());
+    if (e < margin && normalised_e < error)  break;
+    delay(10);
     }
 }
 
@@ -397,9 +400,13 @@ void classicMoveToMP(float x, float y, float max_speed, float hmax, float ykp, f
 {
     movement_reset();
     mp_calc.first = false;
+    if (backwards)  {
+    mp_calc.direction_multiplier = -1;
+    } else {
     mp_calc.direction_multiplier = 1;
-    if (backwards)  mp_calc.direction_multiplier = -1;
-    mp_calc.acel = acel, mp_calc.dist = mp_calc.linearError2D(), mp_calc.max_speed = max_speed;
+    }
+    mp_calc.dist = mp_calc.linearError2D();
+    mp_calc.acel = acel, mp_calc.max_speed = max_speed;
     mp_calc.initial_y_tracker_inches = bot.parallel_inch;
     backwards_move = backwards;
     bot.x_target = x;
@@ -409,6 +416,7 @@ void classicMoveToMP(float x, float y, float max_speed, float hmax, float ykp, f
     drive_pid.slewAmount = 12;
     drive_pid.setConstants(ykp, drive_pid.ki, drive_pid.kd);
     turn_pid.setConstants(hkp, 0, turn_pid.kd);
+    mp_calc.initial_dist = bot.point_distance(bot.x, bot.y, bot.x_target, bot.y_target);
     movement_type_index = 12;
     if (breakLength > 0)
     {

@@ -18,13 +18,13 @@ void test_auto()
 {
 
     start_auto(0,0,0);
-    classicMoveToMP(0, -30, 35, 12, ykp, hkp*.3, 10, 1, true);
-    printf("\n\n\n\nfirst\n\n\n\n\n");
-    delay(500);
-    classicMoveToMP(0, 0, 35, 12, ykp, hkp*.3, 10, 1, false);
-    printf("second");
-    delay(500);
-    turn_to(0, hkp, hki, hkd, 12, 3);
+    classicMoveToMP(30, 30, 65, 12, ykp, hkp*.35, 150, 1, false);
+    delay(200);
+    classicMoveToMP(-30, 45, 65, 12, ykp, hkp*.35, 150, 2, false);
+    delay(200);
+    classicMoveToMP(0, 0, 65, 12, ykp, hkp*.35, 150, 2, true);
+    delay(200);
+    turn_to(0, hkp*.75, hki, hkd, 12, 3);
     stop_auto();
 
     straightMP(60, 69, 150, ykp, yki, ykd, 1);

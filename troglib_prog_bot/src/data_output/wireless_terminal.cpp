@@ -8,12 +8,15 @@
 #include "drive_movement/motion_profile.h"
 #include "drive_movement/auto_movement_loop.h"
 #include "drive_movement/motion_profile.h"
-
 #include <iostream>
 #include <string>
+
+
+
 using namespace vex;
+
 bool wireless_terminal_on = true;
-float loop_refresh_time = 20;
+float loop_refresh_time = 100;
 void standardReadout()
 {
     // sweep.sweep_cycle();
@@ -21,8 +24,8 @@ void standardReadout()
     //printf("v:%.2f ", bot.linear_speed);
     //printf("tx%.2f ", bot.perpindicular_inch);
     //printf("ty%.2f ", bot.parallel_inch);
-    printf("T:%7.3f  ", mp_calc.travelled);
-    printf("E:%7.3f  ", mp_calc.error);
+    //printf("T:%7.3f  ", mp_calc.travelled);
+    //printf("E:%7.3f  ", mp_calc.error);
     printf("X:%7.3f  ", bot.x);
     printf("Y:%7.3f  ", bot.y);
     printf("H:%7.3f  ", bot.h_deg);
@@ -57,8 +60,9 @@ void print_to_terminal()
 {
     if (wireless_terminal_on)
     {
-        //standardReadout();
-
+        standardReadout();
+        //printf("\nE:%.2f, Y%.2f", mp_calc.error, bot.y);
+        //printf("   LP:%7.3f  ", mp_calc.left_pow);
         // wait(1000, vex::sec);
          //graphingFormat();
         //if(start_time > 0 && end_time == 0) graphingFormat();
@@ -70,6 +74,7 @@ int wireless_readout_thread()
 {
     printf("\n");
     printf("\n");
+
     while (1)
     {
         print_to_terminal();

@@ -33,56 +33,61 @@ float MP_move::acelDist(float initial_v, float final_v, float a)
 
 float MP_move::mp_1d_speed(float dist, float max_v, float acel, bool adaptive)
 {
-    if (adaptive)
-        error = (linearError2D());
-    else
-        error = (initial_y_tracker_inches + dist) - bot.parallel_inch;
+    if (adaptive) error = linearError2D();
+    else error = (initial_y_tracker_inches + dist) - bot.parallel_inch;
+
+    float error_sign = left_side_drive.signum(error);
+
     travelled = fabs(bot.parallel_inch - initial_y_tracker_inches); // current distance travelled
     dist = fabs(dist);
-    float acel_dist = acelDist(max_v, 0, acel);
-    if (2 * acel_dist > dist)
-        acel_dist = dist / 2;
+    float acel_dist = fabs(acelDist(0, max_v, acel));
+    if (2 * acel_dist > fabs(initial_dist))
+        acel_dist =  fabs(initial_dist) / 2;
 
-        printf("\n\n\n\n");
-        printf("pd");
+        //printf("\n");
+        //printf("\nAD %.2f ", acel_dist);
 
     if (fabs(error) < mp_disable_length)
     {
         left_pow = drive_pid.calculate(error);
         right_pow = left_pow;
-        printf("pd");
+        //printf("\npd ");
     }
 
     else
     {
         if (travelled < acel_dist) // acel portion
         {
-            current_target_acel = acel * direction_multiplier;
-            pow = direction_multiplier * sqrt(fabs(2 * acel * travelled));
+            current_target_acel = acel * error_sign;
+            pow = error_sign * sqrt(fabs(2 * acel * travelled));
+            //printf("\n AP:%.2f ", pow);
+            //pow = direction_multiplier * sqrt(fabs(2 * acel * travelled));
+            left_pow = left_side_drive.motor_power(pow, current_target_acel, bot.left_linear_speed);
+            right_pow = right_side_drive.motor_power(pow, current_target_acel, bot.right_linear_speed);
+            if (fabs(left_pow) <= 1.5) left_pow = 1.5 * error_sign, right_pow = 1.5 * error_sign;
             // printf("\n acel pow: %f", pow);
-            printf("acel ");
         }
         else if (fabs(error) > acel_dist) // coast portion
         {
-            pow = max_v * direction_multiplier;
-            current_target_acel = 0;
+            pow = max_v * error_sign;
+            left_pow = left_side_drive.motor_power(pow, 0, bot.left_linear_speed);
+            right_pow = right_side_drive.motor_power(pow, 0, bot.right_linear_speed);
             // printf("\n coast pow: %f", pow);
-            printf("coast ");
+            //printf("\ncoast ");
         }
         else
         {
-            pow = direction_multiplier * sqrt(fabs(2 * acel * error));
-            current_target_acel = acel * -1 * direction_multiplier;
+            pow = error_sign * sqrt(fabs(2 * acel * error));
+            current_target_acel = acel * -1 * error_sign;
+            left_pow = left_side_drive.motor_power(pow, current_target_acel, bot.left_linear_speed);
+            right_pow = right_side_drive.motor_power(pow, current_target_acel, bot.right_linear_speed);
             // printf("\n decel pow: %f", pow);
-            printf("decel ");
+            //printf("\ndecel ");
         }
-
-        left_pow = left_side_drive.motor_power(pow, current_target_acel, bot.left_linear_speed);
-        right_pow = right_side_drive.motor_power(pow, current_target_acel, bot.right_linear_speed);
     }
-    if (fabs(error) > mp_disable_length && fabs(left_pow) <= 1.5)
-        left_pow = 1.5 * direction_multiplier, right_pow = 1.5 * direction_multiplier;
-    printf("   LP:%7.3f  ", left_pow);
+
+
+
 
     output = pow;
     return pow;
@@ -133,6 +138,17 @@ void MP_move::classicToPoint()
     }
     else if (xy_error_length > turn_disable_distance)
     {
+        float initial_left_pow = left_pow + hpow;
+        float initial_right_pow = right_pow - hpow;
+        float above_max;
+        if (fabs(initial_left_pow) > 12) {
+            above_max = 12 - fabs(initial_left_pow);
+        }
+        if (fabs(initial_right_pow) > 12) {
+            float temp_above_max = 12 - fabs(initial_right_pow);
+            if (temp_above_max > above_max) above_max = temp_above_max;
+        }   
+
         auto_left_drive_power = left_pow + hpow,
         auto_right_drive_power = right_pow - hpow;
         first = true;
