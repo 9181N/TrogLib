@@ -1,11 +1,12 @@
 #include "drive_movement/auto_funcs.h"
+#include "drive_movement/motion_profile.h"
 #include "motor_controller.h"
 #include "sensor_data.h"
 #include "vex.h"
 #include <iostream>
 
-float ykp = .7, yki = 0.0, ykd = 6;
-float hkp = .28, hki = .01, hkd = 3;
+float ykp = 1.15, yki = 0.0, ykd = 8;
+float hkp = .2, hki = .015, hkd = 1.5;
 
 /*
 odomTune(.1, hki, hkd, 3);
@@ -18,14 +19,54 @@ void test_auto()
 {
 
     start_auto(0,0,0);
-    classicMoveToMP(30, 30, 65, 12, ykp, hkp*.35, 150, 1, false);
-    delay(200);
-    classicMoveToMP(-30, 45, 65, 12, ykp, hkp*.35, 150, 2, false);
-    delay(200);
-    classicMoveToMP(0, 0, 65, 12, ykp, hkp*.35, 150, 2, true);
-    delay(200);
-    turn_to(0, hkp*.75, hki, hkd, 12, 3);
+    mp_calc.classic_turn_margin = 100;
+    classicMoveToMP(0, 30, 60, 12, ykp, hkp*0.5, 150, 18, false, false);
+    classicMoveToMP(-30, 60, 60, 12, ykp, hkp*0.5, 200, 18, false, true);
+    classicMoveToMP(-60, 30, 60, 12, ykp, hkp*0.5, 200, 18, false, true);
+    classicMoveToMP(-30, 0, 60, 12, ykp, hkp*0.5, 200, 18, false, true);
+    // /delay(200);
+    classicMoveToMP(0, 0, 60, 12, ykp, hkp*0.9, 150, 2, false, false);
+    turn_to(0, hkp, hki, hkd, 12, 3);
+
+
     stop_auto();
+
+
+    classicMoveToMP(30, 30, 69, 12, ykp, hkp*0.8, 200, 2, false, false);
+    //delay(200);
+    classicMoveToMP(-30, 45, 69, 12, ykp, hkp*0.8, 200, 2, true, false);
+    delay(200);
+    classicMoveToMP(0, 0, 69, 12, ykp, hkp*0.8, 200, 2, true, false);
+    //delay(200);
+    turn_to(0, hkp, hki, hkd, 12, 3);
+    stop_auto();
+
+
+        turn_to(180, hkp, hki, hkd, 12, 1);
+        delay(100);
+        turn_to(0, hkp, hki, hkd, 12, 1);
+        delay(100);
+        turn_to(135, hkp, hki, hkd, 12, 1);
+        delay(100);
+        turn_to(0, hkp, hki, hkd, 12, 1);
+        delay(100);
+        turn_to(90, hkp, hki, hkd, 12, 1);
+        delay(100);
+        turn_to(0, hkp, hki, hkd, 12, 1);
+        delay(100);
+        turn_to(45, hkp, hki, hkd, 12, 1);
+        delay(100);
+        turn_to(0, hkp, hki, hkd, 12, 1);
+        
+    stop_auto();
+
+    straight(24, ykp, yki, ykd, 12, .4, 1);
+    delay(300);
+    straight(-24, ykp, yki, ykd, 12, .4, 1);
+    delay(300);
+
+
+
 
     straightMP(60, 69, 150, ykp, yki, ykd, 1);
     delay(500);

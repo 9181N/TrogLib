@@ -22,6 +22,8 @@ void start_auto(float x, float y, float h)
     turn_pid.maxintegral = 2;
     drive_pid.integralbound = 5;
     drive_pid.maxintegral = 2;
+    drive_pid.setConstants(ykp, yki, ykd);
+    turn_pid.setConstants(hkp, hki, hkd);
     start_time = Brain.timer(vex::msec);
     enable_auto_movement = true;
     drive_controllers(1, 1);
@@ -71,11 +73,12 @@ void wait_for_break_length2(float error)
 {
     while (1)
     {
-    float e = bot.point_distance(bot.x, bot.y, bot.x_target, bot.y_target);
-    float margin = mp_calc.turn_disable_distance;
-    float normalised_e = fabs(mp_calc.linearError2D());
-    if (e < margin && normalised_e < error)  break;
-    delay(10);
+        float e = bot.point_distance(bot.x, bot.y, bot.x_target, bot.y_target);
+        float margin = mp_calc.turn_disable_distance;
+        float normalised_e = fabs(mp_calc.linearError2D());
+        if (e < margin && normalised_e < error)
+            break;
+        delay(10);
     }
 }
 
@@ -394,17 +397,28 @@ void straightMP(float dist, float max_speed, float acel, float kp, float ki, flo
     bot.h_target = bot.h_deg;
 }
 
-
-
-void classicMoveToMP(float x, float y, float max_speed, float hmax, float ykp, float hkp, float acel, float breakLength, bool backwards)
+void classicMoveToMP(float x, float y, float max_speed, float hmax, float ykp, float hkp, float acel, float breakLength, bool backwards, bool chained)
 {
     movement_reset();
     mp_calc.first = false;
-    if (backwards)  {
-    mp_calc.direction_multiplier = -1;
-    } else {
-    mp_calc.direction_multiplier = 1;
+    if (backwards)
+    {
+        mp_calc.direction_multiplier = -1;
     }
+    else
+    {
+        mp_calc.direction_multiplier = 1;
+    }
+    
+    if (chained)
+    {
+        mp_calc.disable_acel = true;
+    }
+    else
+    {
+        mp_calc.disable_acel = false;
+    }
+
     mp_calc.dist = mp_calc.linearError2D();
     mp_calc.acel = acel, mp_calc.max_speed = max_speed;
     mp_calc.initial_y_tracker_inches = bot.parallel_inch;
@@ -420,6 +434,6 @@ void classicMoveToMP(float x, float y, float max_speed, float hmax, float ykp, f
     movement_type_index = 12;
     if (breakLength > 0)
     {
-        wait_for_break_length2(breakLength);
+        wait_for_break_length(breakLength);
     }
 }

@@ -56,7 +56,7 @@ float MP_move::mp_1d_speed(float dist, float max_v, float acel, bool adaptive)
 
     else
     {
-        if (travelled < acel_dist) // acel portion
+        if (travelled < acel_dist && !disable_acel) // acel portion
         {
             current_target_acel = acel * error_sign;
             pow = error_sign * sqrt(fabs(2 * acel * travelled));

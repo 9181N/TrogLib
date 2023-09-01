@@ -35,7 +35,7 @@ void standardReadout()
     printf("L%7.2f  ", bot.point_distance(bot.x, bot.y, bot.x_target, bot.y_target));
 
     //printf("T%7.2f ", (Brain.timer(msec) - start_time) / 1000);
-    //printf("ET%7.2f ", (end_time) / 1000);
+    printf("ET%7.2f ", (end_time) / 1000);
 }
 
 int counter = 0;

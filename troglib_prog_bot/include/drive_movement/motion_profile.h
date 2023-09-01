@@ -4,8 +4,9 @@ class MP_move
 {
 public:
     bool first = false;
+    bool disable_acel = false;
     float turn_disable_distance = 5;
-    float classic_turn_margin = 80;
+    float classic_turn_margin = 70;
     float mp_disable_length = 4;
     float initial_y_tracker_inches;
     float straight_mp_length;
