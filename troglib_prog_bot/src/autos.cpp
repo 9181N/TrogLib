@@ -21,10 +21,10 @@ void test_auto()
     start_auto(0,0,0);
     mp_calc.classic_turn_margin = 100;
     classicMoveToMP(0, 30, 60, 12, ykp, hkp*0.5, 150, 18, false, false);
-    classicMoveToMP(-30, 60, 60, 12, ykp, hkp*0.5, 200, 18, false, true);
+    classicMoveToMP(-30, 60, 30, 12, ykp, hkp*0.5, 200, 18, false, true);
     classicMoveToMP(-60, 30, 60, 12, ykp, hkp*0.5, 200, 18, false, true);
-    classicMoveToMP(-30, 0, 60, 12, ykp, hkp*0.5, 200, 18, false, true);
-    // /delay(200);
+    classicMoveToMP(-30, 0, 30, 12, ykp, hkp*0.5, 200, 18, false, true);
+    //delay(200);
     classicMoveToMP(0, 0, 60, 12, ykp, hkp*0.9, 150, 2, false, false);
     turn_to(0, hkp, hki, hkd, 12, 3);
 
