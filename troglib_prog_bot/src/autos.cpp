@@ -18,46 +18,43 @@ step 4: once robot again stops moving go to pc and copy the outputted SS SR and 
 void test_auto()
 {
 
-    start_auto(0,0,0);
+    start_auto(0, 0, 0);
     mp_calc.classic_turn_margin = 100;
-    classicMoveToMP(0, 30, 60, 12, ykp, hkp*0.5, 150, 18, false, false);
-    classicMoveToMP(-30, 60, 30, 12, ykp, hkp*0.5, 200, 18, false, true);
-    classicMoveToMP(-60, 30, 60, 12, ykp, hkp*0.5, 200, 18, false, true);
-    classicMoveToMP(-30, 0, 30, 12, ykp, hkp*0.5, 200, 18, false, true);
-    //delay(200);
-    classicMoveToMP(0, 0, 60, 12, ykp, hkp*0.9, 150, 2, false, false);
+    classicMoveToMP(0, 30, 60, 12, ykp, hkp * 0.5, 150, 18, false, false);
+    classicMoveToMP(-30, 60, 30, 12, ykp, hkp * 0.5, 200, 18, false, true);
+    classicMoveToMP(-60, 30, 60, 12, ykp, hkp * 0.5, 200, 18, false, true);
+    classicMoveToMP(-30, 0, 30, 12, ykp, hkp * 0.5, 200, 18, false, true);
+    // delay(200);
+    classicMoveToMP(0, 0, 60, 12, ykp, hkp * 0.9, 150, 2, false, false);
     turn_to(0, hkp, hki, hkd, 12, 3);
-
 
     stop_auto();
 
-
-    classicMoveToMP(30, 30, 69, 12, ykp, hkp*0.8, 200, 2, false, false);
-    //delay(200);
-    classicMoveToMP(-30, 45, 69, 12, ykp, hkp*0.8, 200, 2, true, false);
+    classicMoveToMP(30, 30, 69, 12, ykp, hkp * 0.8, 200, 2, false, false);
+    // delay(200);
+    classicMoveToMP(-30, 45, 69, 12, ykp, hkp * 0.8, 200, 2, true, false);
     delay(200);
-    classicMoveToMP(0, 0, 69, 12, ykp, hkp*0.8, 200, 2, true, false);
-    //delay(200);
+    classicMoveToMP(0, 0, 69, 12, ykp, hkp * 0.8, 200, 2, true, false);
+    // delay(200);
     turn_to(0, hkp, hki, hkd, 12, 3);
     stop_auto();
 
+    turn_to(180, hkp, hki, hkd, 12, 1);
+    delay(100);
+    turn_to(0, hkp, hki, hkd, 12, 1);
+    delay(100);
+    turn_to(135, hkp, hki, hkd, 12, 1);
+    delay(100);
+    turn_to(0, hkp, hki, hkd, 12, 1);
+    delay(100);
+    turn_to(90, hkp, hki, hkd, 12, 1);
+    delay(100);
+    turn_to(0, hkp, hki, hkd, 12, 1);
+    delay(100);
+    turn_to(45, hkp, hki, hkd, 12, 1);
+    delay(100);
+    turn_to(0, hkp, hki, hkd, 12, 1);
 
-        turn_to(180, hkp, hki, hkd, 12, 1);
-        delay(100);
-        turn_to(0, hkp, hki, hkd, 12, 1);
-        delay(100);
-        turn_to(135, hkp, hki, hkd, 12, 1);
-        delay(100);
-        turn_to(0, hkp, hki, hkd, 12, 1);
-        delay(100);
-        turn_to(90, hkp, hki, hkd, 12, 1);
-        delay(100);
-        turn_to(0, hkp, hki, hkd, 12, 1);
-        delay(100);
-        turn_to(45, hkp, hki, hkd, 12, 1);
-        delay(100);
-        turn_to(0, hkp, hki, hkd, 12, 1);
-        
     stop_auto();
 
     straight(24, ykp, yki, ykd, 12, .4, 1);
@@ -65,17 +62,12 @@ void test_auto()
     straight(-24, ykp, yki, ykd, 12, .4, 1);
     delay(300);
 
-
-
-
     straightMP(60, 69, 150, ykp, yki, ykd, 1);
     delay(500);
     straightMP(-60, 69, 150, ykp, yki, ykd, 1);
     delay(500);
 
-
-
-    start_auto(0,0,0);
+    start_auto(0, 0, 0);
     classic_move_to(30, 30, 8, 12, ykp, hkp * .3, .125, 4, false);
     classic_move_to(0, 0, 8, 12, ykp, hkp * .3, .125, 4, false);
     stop_auto();

@@ -29,7 +29,6 @@ public:
     double relativeangle(float x1, float y1, float x2, float y2);
     float vector_x_length_at_theta(float theta, float vector_length);
     float vector_y_length_at_theta(float theta, float vector_length);
-
 };
 
 extern data bot;

@@ -10,6 +10,7 @@
 #include "drive_movement/sweeper.h"
 #include "drive_movement/motion_profile.h"
 #include "drive_movement/velo_controller.h"
+#include "drive_movement/pathing/bezier_curves.h"
 
 using namespace vex;
 brain Brain;
@@ -27,58 +28,81 @@ inertial IMU1 = inertial(PORT1);
 encoder TY = encoder(Brain.ThreeWirePort.E);
 encoder TX = encoder(Brain.ThreeWirePort.G);
 
-
 extern task motor_control;
 
+data bot(
+    // horizontal tracking wheel offset (positive for back of robot)
+    0.0586285,
 
-  data bot(0.0586285, -0.0164235, 1.011868, true);
-  PID sweeper_pid(.1,0,0);
-  sweeper_class sweep;
-  PID drive_pid(0, 0, 0);
-  PID turn_pid(0, 0, 0);
-  MP_move mp_calc;
-  velo_controller left_side_drive(0.17, 0.025, 0.025, 0); //0.02 ka 0.03 kd
-  velo_controller right_side_drive(0.17, 0.025, 0.025, 0); 
-int odometry_thread_wrapper() {
+    // vertical tracking wheel offset (positive for right side of robot)
+    -0.0164235,
+
+    // IMU multiplier
+    1.011868,
+
+    // Toggle using tracking wheels
+    true
+
+);
+
+PID sweeper_pid(.1, 0, 0);
+sweeper_class sweep;
+PID drive_pid(0, 0, 0);
+PID turn_pid(0, 0, 0);
+MP_move mp_calc;
+velo_controller left_side_drive(0.17, 0.025, 0.025, 0); // 0.02 ka 0.03 kd
+velo_controller right_side_drive(0.17, 0.025, 0.025, 0);
+int odometry_thread_wrapper()
+{
   bot.odom_thread();
   return 0;
 }
-void pre_auton(void) {
+void pre_auton(void)
+{
   IMU1.calibrate();
   task motor_control(motor_thread);
   task brain_screen(brain_readout_thread);
   task terminal(wireless_readout_thread);
   task odometry(odometry_thread_wrapper);
-bot.reset_sensors();
-bot.setPos(0,0,0);
+  bot.reset_sensors();
+  bot.setPos(0, 0, 0);
 }
 
-void autonomous(void) {
-        enable_user_control = false;
-test_auto();
-//prog_skills_15();
+void autonomous(void)
+{
+  enable_user_control = false;
+  test_auto();
+  // prog_skills_15();
 }
 
-
-void usercontrol(void) {
+void usercontrol(void)
+{
   enable_auto_movement = false;
   drive_controllers(1, 1);
-  if (bot.use_tracking_wheels) intake_controller(1);
+  if (bot.use_tracking_wheels)
+    intake_controller(1);
   sweeper_controller(0);
 
-  if (Controller.ButtonLeft.pressing()) wait(2400, vex::msec), autonomous();
-  while (1) {
-      enable_user_control = true;
+  wireless_terminal_on = false;
+  print_cubic(0,0, 10,20, 30,20, 40,40, 50);
+
+  if (Controller.ButtonLeft.pressing())
+    wait(2400, vex::msec), autonomous();
+  while (1)
+  {
+    enable_user_control = true;
     user_drive_control();
     wait(10, msec);
   }
 }
 
-int main() {
+int main()
+{
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
   pre_auton();
-  while (true) {
+  while (true)
+  {
     wait(100, msec);
   }
 }
