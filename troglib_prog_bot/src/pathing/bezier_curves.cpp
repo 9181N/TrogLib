@@ -200,12 +200,35 @@ void pathLength()
 void generate_cubic_values(float x0, float y0, float x1, float y1, float x2, float y2, float x3, float y3, float fidelity)
 {
     path1.fidelity = fidelity;
-    interpolateCubicX(x0, x1, x2, x3, fidelity);
-    interpolateCubicY(y0, y1, y2, y3, fidelity);
-    interpolateCubicH(x0, y0, x1, y1, x2, y2, x3, y3, fidelity);
-    interpolateCubicD2X(x0, x1, x2, x3, fidelity);
-    printf("\n\n");
-    interpolateCubicD2Y(y0, y1, y2, y3, fidelity);
+
+    float t = 0;
+    for (int i = 0; i <= fidelity; i++)
+    {
+        t = (float)i / fidelity;
+        if (t <= 1)
+        {
+            path1.t[i] = t;
+            path1.x[i] = cubicAtT(x0, x1, x2, x3, t);
+            path1.y[i] = cubicAtT(y0, y1, y2, y3, t);
+            path1.d1rise[i] = bezierTangent(t, y0, y1, y2, y3);
+            path1.d1run[i] = bezierTangent(t, x0, x1, x2, x3);
+            path1.h[i] = tangent_at_degrees(t, x0, y0, x1, y1, x2, y2, x3, y3);
+            path1.d1slope[i] = tangent_at(t, x0, y0, x1, y1, x2, y2, x3, y3);
+
+            path1.d2x[i] = cubic_bezier_2nd_deriv(t, x0, x1, x2, x3);
+            path1.d2y[i] = cubic_bezier_2nd_deriv(t, y0, y1, y2, y3);
+            path1.d2slope[i] = path1.d2y[i] / path1.d2x[i];
+        }
+        else
+        {
+            path1.x[i] = path1.x[path1.fidelity];
+            path1.y[i] = path1.y[path1.fidelity];
+            path1.h[i] = path1.h[path1.fidelity];
+            path1.d2x[i] = path1.d2x[path1.fidelity];
+            path1.d2y[i] = path1.d2y[path1.fidelity];
+        }
+    }
+
     pathLength();
 }
 
@@ -222,8 +245,9 @@ void print_cubic(float x0, float y0, float x1, float y1, float x2, float y2, flo
     {
         // printf("(%.2f),", path1.d2x[i]);
         //printf("(%.2f, %.2f),", path1.x[i], path1.y[i]);
-        printf("(%.2f),", path1.d2y[i]/path1.d2x[i]); // slope
+        //printf("(%.2f),", path1.d2y[i]/path1.d2x[i]); // slope
         //printf("(%.2f, %.2f),", path1.d2x[i], path1.d2y[i]);
+        printf("(%.2f,%.2f),", path1.t[i], path1.d2slope[i]);
 
         //printf("(%.2f),", path1.h[i]);
         if (p > 4)

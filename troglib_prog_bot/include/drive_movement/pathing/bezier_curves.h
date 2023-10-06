@@ -2,11 +2,15 @@ struct path {
     double x[1000];
     double y[1000];
     double h[1000];
+    double t[1000];
+    double d1rise[1000];
+    double d1run[1000];
+    double d1slope[1000];
     double d2x[1000];
     double d2y[1000];
     double d2slope[1000];
     double length{0};
-    double fidelity{100};
+    int fidelity{100};
 };
 
 extern struct path path1;
