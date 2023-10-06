@@ -244,10 +244,10 @@ void print_cubic(float x0, float y0, float x1, float y1, float x2, float y2, flo
     for (int i = 0; i <= fidelity; i++)
     {
         // printf("(%.2f),", path1.d2x[i]);
-        //printf("(%.2f, %.2f),", path1.x[i], path1.y[i]);
+        printf("(%.2f, %.2f),", path1.x[i], path1.y[i]);
         //printf("(%.2f),", path1.d2y[i]/path1.d2x[i]); // slope
         //printf("(%.2f, %.2f),", path1.d2x[i], path1.d2y[i]);
-        printf("(%.2f,%.2f),", path1.t[i], path1.d2slope[i]);
+        //printf("(%.2f,%.2f),", path1.t[i], path1.d2slope[i]);
 
         //printf("(%.2f),", path1.h[i]);
         if (p > 4)

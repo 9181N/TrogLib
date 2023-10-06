@@ -1,3 +1,4 @@
+#pragma once
 struct path {
     double x[1000];
     double y[1000];

@@ -11,6 +11,7 @@
 #include "drive_movement/motion_profile.h"
 #include "drive_movement/velo_controller.h"
 #include "drive_movement/pathing/bezier_curves.h"
+#include "drive_movement/pathing/pps.h"
 
 using namespace vex;
 brain Brain;
@@ -50,6 +51,7 @@ sweeper_class sweep;
 PID drive_pid(0, 0, 0);
 PID turn_pid(0, 0, 0);
 MP_move mp_calc;
+line_intersection get_line;
 velo_controller left_side_drive(0.17, 0.025, 0.025, 0); // 0.02 ka 0.03 kd
 velo_controller right_side_drive(0.17, 0.025, 0.025, 0);
 int odometry_thread_wrapper()
@@ -84,7 +86,9 @@ void usercontrol(void)
   sweeper_controller(0);
 
   wireless_terminal_on = false;
-  print_cubic(0,0, 10,20, 30,20, 40,40, 50);
+  print_cubic(0,0, 0,20, 30,20, 40,40, 100);
+  get_line.goal_pt_search(20);
+  printf("\n\n (%.2f,%.2f)", get_line.goal_x, get_line.goal_y);
 
   if (Controller.ButtonLeft.pressing())
     wait(2400, vex::msec), autonomous();
