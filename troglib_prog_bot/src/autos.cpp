@@ -1,5 +1,6 @@
 #include "drive_movement/auto_funcs.h"
 #include "drive_movement/motion_profile.h"
+#include "drive_movement/pathing/bezier_curves.h"
 #include "motor_controller.h"
 #include "sensor_data.h"
 #include "vex.h"
@@ -20,6 +21,22 @@ void test_auto()
 
     start_auto(0, 0, 0);
     mp_calc.classic_turn_margin = 100;
+    classic_pps_path(0,0, -20,50, 100,-30, 40, 40, 50, 8, 12, ykp, hkp, hkd*1.5, .5, 12, 5, false);
+    printf("done1\n\n");
+    classic_pps_path(40,40, 100,-30, -20,50, 0, 0, 50, 8, 12, ykp, hkp, hkd*1.5, .5, 12, 5, true);
+    printf("done2\n\n");
+
+    //CubicMP(0,0, 0,20, 20,20, 20, 40, 50, 30, 12, ykp, hkp, 100, 5, 10, false, false);
+    //CubicMP(20,40, 30,30, 50,-10, 0, 0, 50, 30, 12, ykp, hkp, 100, 5, 10, true, false);
+
+    //classic_move_to(0, -20, 8, 12, ykp, hkp * 1.5, .125, 4, true);
+    //classic_move_to(0, -30, 8, 12, ykp, hkp * 1.5, .125, 4, true);
+    //classic_move_to(0, 0, 8, 12, ykp, hkp * 1.5, .125, 4, false);
+
+    turn_to(0, hkp, hki, hkd, 12, 3);
+
+    stop_auto();
+
     classicMoveToMP(0, 30, 60, 12, ykp, hkp * 0.5, 150, 18, false, false);
     classicMoveToMP(-30, 60, 30, 12, ykp, hkp * 0.5, 200, 18, false, true);
     classicMoveToMP(-60, 30, 60, 12, ykp, hkp * 0.5, 200, 18, false, true);
@@ -28,7 +45,6 @@ void test_auto()
     classicMoveToMP(0, 0, 60, 12, ykp, hkp * 0.9, 150, 2, false, false);
     turn_to(0, hkp, hki, hkd, 12, 3);
 
-    stop_auto();
 
     classicMoveToMP(30, 30, 69, 12, ykp, hkp * 0.8, 200, 2, false, false);
     // delay(200);

@@ -24,6 +24,7 @@ public:
     float mp_1d_speed(float dist, float max_v, float acel, bool adaptive);
     void straight();
     void classicToPoint();
+    void pathFollow();
 };
 
 extern MP_move mp_calc;

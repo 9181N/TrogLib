@@ -11,6 +11,8 @@
 #include "data_output/wireless_terminal.h"
 #include "data_output/brain_screen.h"
 #include "robot_config.h"
+#include "drive_movement/pathing/bezier_curves.h"
+#include "drive_movement/pathing/pps.h"
 #include <iostream>
 #include <iomanip>
 
@@ -49,6 +51,7 @@ void delay(float msec)
 
 void movement_reset()
 {
+    movement_type_index = 0;
     drive_pid.reset(), turn_pid.reset();
     auto_left_drive_power = 0, auto_right_drive_power = 0;
 }
@@ -69,15 +72,14 @@ void wait_for_break_length(float error)
     }
 }
 
-void wait_for_break_length2(float error)
+void wait_for_break_path(float error)
 {
-    while (1)
+    double xy_error = bot.point_distance(bot.x, bot.y, path1.x[path1.fidelity], path1.y[path1.fidelity]);
+    while (xy_error > error)
     {
-        float e = bot.point_distance(bot.x, bot.y, bot.x_target, bot.y_target);
-        float margin = mp_calc.turn_disable_distance;
-        float normalised_e = fabs(mp_calc.linearError2D());
-        if (e < margin && normalised_e < error)
-            break;
+        xy_error = bot.point_distance(bot.x, bot.y, path1.x[path1.fidelity], path1.y[path1.fidelity]);
+        //printf("(%.2f,%.2f),(%.2f,%.2f),(%.2f,%.2f)\n", bot.x,bot.y,bot.x_target,bot.y_target, path1.x[path1.fidelity], path1.y[path1.fidelity]);
+        printf("E: %.2f,  x:%.2f, y:%.2f\n",xy_error, path1.x[path1.fidelity], path1.y[path1.fidelity]); 
         delay(10);
     }
 }
@@ -368,6 +370,26 @@ void classic_move_to(float x, float y, float ymax, float hmax, float ykp, float 
     }
 }
 
+void classic_pps_path(float x0, float y0, float x1, float y1, float x2, float y2, float x3, float y3, float fidelity, float ymax, float hmax, float ykp, float hkp, float hkd, float slew, float look_ahead, float breakLength, bool backwards)
+{
+    movement_reset();
+    generate_cubic_values(x0, y0, x1, y1, x2, y2, x3, y3, fidelity);
+    get_line.look_ahead_dist = look_ahead;
+    backwards_move = backwards;
+    get_line.searchForIntersect();
+    drive_pid.maxOutput = ymax;
+    turn_pid.maxOutput = hmax;
+    drive_pid.slewAmount = slew;
+    drive_pid.setConstants(ykp, drive_pid.ki, drive_pid.kd);
+    turn_pid.setConstants(hkp, 0, hkd);
+    movement_type_index = 14;
+    if (breakLength > 0)
+    {
+        wait_for_break_path(breakLength);
+    }
+}
+
+
 void straightMP(float dist, float max_speed, float acel, float kp, float ki, float kd, float breakdist)
 {
     movement_reset();
@@ -435,5 +457,48 @@ void classicMoveToMP(float x, float y, float max_speed, float hmax, float ykp, f
     if (breakLength > 0)
     {
         wait_for_break_length(breakLength);
+    }
+}
+
+
+void CubicMP(float x0, float y0, float x1, float y1, float x2, float y2, float x3, float y3, float fidelity, float max_speed, float hmax, float ykp, float hkp, float acel, float breakLength, float look_ahead, bool backwards, bool chained)
+{
+    generate_cubic_values(x0, y0, x1, y1, x2, y2, x3, y3, fidelity);
+    movement_reset();
+    mp_calc.first = false;
+    if (backwards)
+    {
+        mp_calc.direction_multiplier = -1;
+    }
+    else
+    {
+        mp_calc.direction_multiplier = 1;
+    }
+    
+    if (chained)
+    {
+        mp_calc.disable_acel = true;
+    }
+    else
+    {
+        mp_calc.disable_acel = false;
+    }
+    get_line.look_ahead_dist = look_ahead;
+    mp_calc.dist = mp_calc.linearError2D();
+    mp_calc.acel = acel, mp_calc.max_speed = max_speed;
+    mp_calc.initial_y_tracker_inches = bot.parallel_inch;
+    backwards_move = backwards;
+    get_line.searchForIntersect();
+    bot.x_target = get_line.goal_x, bot.y_target = get_line.goal_y;
+    turn_pid.maxOutput = hmax;
+    drive_pid.maxOutput = 12;
+    drive_pid.slewAmount = 12;
+    drive_pid.setConstants(ykp, drive_pid.ki, drive_pid.kd);
+    turn_pid.setConstants(hkp, 0, turn_pid.kd);
+    mp_calc.initial_dist = bot.point_distance(bot.x, bot.y, bot.x_target, bot.y_target);
+    movement_type_index = 13;
+    if (breakLength > 0)
+    {
+        wait_for_break_path(breakLength);
     }
 }

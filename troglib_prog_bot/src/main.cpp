@@ -85,10 +85,10 @@ void usercontrol(void)
     intake_controller(1);
   sweeper_controller(0);
 
-  wireless_terminal_on = false;
-  print_cubic(0,0, 0,20, 30,20, 40,40, 100);
-  get_line.goal_pt_search(20);
-  printf("\n\n (%.2f,%.2f)", get_line.goal_x, get_line.goal_y);
+  //wireless_terminal_on = false;
+  //print_cubic(0,0, 0,20, 40,20, 40, 40, 20);
+  //get_line.searchForIntersect(30);
+  //printf("(%.2f,%.2f),", get_line.goal_x, get_line.goal_y);
 
   if (Controller.ButtonLeft.pressing())
     wait(2400, vex::msec), autonomous();

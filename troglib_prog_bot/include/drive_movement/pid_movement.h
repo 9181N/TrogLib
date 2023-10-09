@@ -19,6 +19,8 @@ public:
     void swing_turn_to_xy_on_left();
     void swing_turn_to_xy_on_right();
     void classic_to_point();
+    void classic_pps_path();
+
 };
 
 extern pid_move pid_calc;

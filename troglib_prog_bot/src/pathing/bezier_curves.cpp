@@ -2,6 +2,8 @@
 #include <vector>
 #include <iostream>
 #include "drive_movement/pathing/bezier_curves.h"
+#include "drive_movement/pathing/pps.h"
+
 // #include "odometry.h"
 // #include <iostream>
 // P = (1−t)3P1 + 3(1−t)2tP2 +3(1−t)t2P3 + t3P4
@@ -200,7 +202,7 @@ void pathLength()
 void generate_cubic_values(float x0, float y0, float x1, float y1, float x2, float y2, float x3, float y3, float fidelity)
 {
     path1.fidelity = fidelity;
-
+    get_line.last_found_index = 1;
     float t = 0;
     for (int i = 0; i <= fidelity; i++)
     {
@@ -235,8 +237,8 @@ void generate_cubic_values(float x0, float y0, float x1, float y1, float x2, flo
 void print_cubic(float x0, float y0, float x1, float y1, float x2, float y2, float x3, float y3, int fidelity)
 {
     printf("\n\n");
-    printf("(%.2f, %.2f),(%.2f, %.2f),(%.2f, %.2f),(%.2f, %.2f),\n\n", x0, y0, x1, y1, x2, y2, x3, y3);
-    wait(1500, vex::msec);
+    printf("(%.2f, %.2f),(%.2f, %.2f),(%.2f, %.2f),(%.2f, %.2f),\n", x0, y0, x1, y1, x2, y2, x3, y3);
+    //wait(1500, vex::msec);
     std::cout << "" << std::flush;
 
     generate_cubic_values(x0, y0, x1, y1, x2, y2, x3, y3, fidelity);
@@ -257,7 +259,7 @@ void print_cubic(float x0, float y0, float x1, float y1, float x2, float y2, flo
         }
         p++;
     }
-    printf("\n\n");
-    printf("curve Length: %.2f", path1.length);
+    printf("\n");
+    //printf("curve Length: %.2f", path1.length);
     std::cout << "" << std::flush;
 }

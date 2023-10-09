@@ -7,7 +7,7 @@
 #include "drive_movement/auto_movement_loop.h"
 #include "vex.h"
 #include "drive_movement/velo_controller.h"
-
+#include "drive_movement/pathing/pps.h"
 double MP_move::linearError2D()
 {
     double delta_x = bot.x_target - bot.x;                      // error on X axis
@@ -33,8 +33,10 @@ float MP_move::acelDist(float initial_v, float final_v, float a)
 
 float MP_move::mp_1d_speed(float dist, float max_v, float acel, bool adaptive)
 {
-    if (adaptive) error = linearError2D();
-    else error = (initial_y_tracker_inches + dist) - bot.parallel_inch;
+    if (adaptive)
+        error = linearError2D();
+    else
+        error = (initial_y_tracker_inches + dist) - bot.parallel_inch;
 
     float error_sign = left_side_drive.signum(error);
 
@@ -42,16 +44,16 @@ float MP_move::mp_1d_speed(float dist, float max_v, float acel, bool adaptive)
     dist = fabs(dist);
     float acel_dist = fabs(acelDist(0, max_v, acel));
     if (2 * acel_dist > fabs(initial_dist))
-        acel_dist =  fabs(initial_dist) / 2;
+        acel_dist = fabs(initial_dist) / 2;
 
-        //printf("\n");
-        //printf("\nAD %.2f ", acel_dist);
+    // printf("\n");
+    // printf("\nAD %.2f ", acel_dist);
 
     if (fabs(error) < mp_disable_length)
     {
         left_pow = drive_pid.calculate(error);
         right_pow = left_pow;
-        //printf("\npd ");
+        // printf("\npd ");
     }
 
     else
@@ -60,11 +62,12 @@ float MP_move::mp_1d_speed(float dist, float max_v, float acel, bool adaptive)
         {
             current_target_acel = acel * error_sign;
             pow = error_sign * sqrt(fabs(2 * acel * travelled));
-            //printf("\n AP:%.2f ", pow);
-            //pow = direction_multiplier * sqrt(fabs(2 * acel * travelled));
+            // printf("\n AP:%.2f ", pow);
+            // pow = direction_multiplier * sqrt(fabs(2 * acel * travelled));
             left_pow = left_side_drive.motor_power(pow, current_target_acel, bot.left_linear_speed);
             right_pow = right_side_drive.motor_power(pow, current_target_acel, bot.right_linear_speed);
-            if (fabs(left_pow) <= 1.5) left_pow = 1.5 * error_sign, right_pow = 1.5 * error_sign;
+            if (fabs(left_pow) <= 1.5)
+                left_pow = 1.5 * error_sign, right_pow = 1.5 * error_sign;
             // printf("\n acel pow: %f", pow);
         }
         else if (fabs(error) > acel_dist) // coast portion
@@ -73,7 +76,7 @@ float MP_move::mp_1d_speed(float dist, float max_v, float acel, bool adaptive)
             left_pow = left_side_drive.motor_power(pow, 0, bot.left_linear_speed);
             right_pow = right_side_drive.motor_power(pow, 0, bot.right_linear_speed);
             // printf("\n coast pow: %f", pow);
-            //printf("\ncoast ");
+            // printf("\ncoast ");
         }
         else
         {
@@ -82,12 +85,9 @@ float MP_move::mp_1d_speed(float dist, float max_v, float acel, bool adaptive)
             left_pow = left_side_drive.motor_power(pow, current_target_acel, bot.left_linear_speed);
             right_pow = right_side_drive.motor_power(pow, current_target_acel, bot.right_linear_speed);
             // printf("\n decel pow: %f", pow);
-            //printf("\ndecel ");
+            // printf("\ndecel ");
         }
     }
-
-
-
 
     output = pow;
     return pow;
@@ -141,13 +141,16 @@ void MP_move::classicToPoint()
         float initial_left_pow = left_pow + hpow;
         float initial_right_pow = right_pow - hpow;
         float above_max;
-        if (fabs(initial_left_pow) > 12) {
+        if (fabs(initial_left_pow) > 12)
+        {
             above_max = 12 - fabs(initial_left_pow);
         }
-        if (fabs(initial_right_pow) > 12) {
+        if (fabs(initial_right_pow) > 12)
+        {
             float temp_above_max = 12 - fabs(initial_right_pow);
-            if (temp_above_max > above_max) above_max = temp_above_max;
-        }   
+            if (temp_above_max > above_max)
+                above_max = temp_above_max;
+        }
 
         auto_left_drive_power = left_pow + hpow,
         auto_right_drive_power = right_pow - hpow;
@@ -157,13 +160,13 @@ void MP_move::classicToPoint()
     {
         if (backwards_move)
         {
-            bot.x_target = bot.x + bot.vector_x_length_at_theta(bot.h_deg + 180, xy_error_length);
-            bot.y_target = bot.y + bot.vector_y_length_at_theta(bot.h_deg + 180, xy_error_length);
+            path1.x[path1.fidelity] = bot.x + bot.vector_x_length_at_theta(bot.h_deg + 180, xy_error_length);
+            path1.y[path1.fidelity] = bot.y + bot.vector_y_length_at_theta(bot.h_deg + 180, xy_error_length);
         }
         if (!backwards_move)
         {
-            bot.x_target = bot.x + bot.vector_x_length_at_theta(bot.h_deg, xy_error_length);
-            bot.y_target = bot.y + bot.vector_y_length_at_theta(bot.h_deg, xy_error_length);
+            path1.x[path1.fidelity] = bot.x + bot.vector_x_length_at_theta(bot.h_deg, xy_error_length);
+            path1.y[path1.fidelity] = bot.y + bot.vector_y_length_at_theta(bot.h_deg, xy_error_length);
         }
 
         auto_left_drive_power = left_pow, auto_right_drive_power = right_pow;
@@ -176,4 +179,10 @@ void MP_move::classicToPoint()
     }
     // printf("\n (%.3f, %.3f)", auto_left_drive_power, auto_right_drive_power);
     // printf("\n (L:%.3f, R:%.3f)", auto_left_drive_power, auto_right_drive_power);
+}
+
+void MP_move::pathFollow()
+{
+    get_line.ppsFollowPath();
+    MP_move::classicToPoint();
 }

@@ -20,7 +20,7 @@ float loop_refresh_time = 100;
 void standardReadout()
 {
     // sweep.sweep_cycle();
-    printf("\n\n");
+    printf("\n");
     //printf("v:%.2f ", bot.linear_speed);
     //printf("tx%.2f ", bot.perpindicular_inch);
     //printf("ty%.2f ", bot.parallel_inch);
